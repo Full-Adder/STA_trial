@@ -55,9 +55,9 @@ def generate_jpg():
 def mp4_to_wav(videos_path, to_path, start_time, end_time):
     videos_file_path = videos_path + ".mp4"
     my_clip = mp.VideoFileClip(videos_file_path)
-    if end_time - start_time == 10:
+    if end_time - start_time != 10:
         my_clip.subclip(start_time, end_time)
-        _, videos_name = os.path.split(videos_path)
+    _, videos_name = os.path.split(videos_path)
     audio_path = os.path.join(to_path, videos_name + ".wav")
     my_clip.audio.write_audiofile(audio_path)
 
