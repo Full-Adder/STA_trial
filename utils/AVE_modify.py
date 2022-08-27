@@ -6,8 +6,7 @@ from scipy import signal
 import soundfile as sf
 import resampy
 import numpy as np
-from DataFromtxt import readDataTxt
-
+from utils.DataFromtxt import readDataTxt
 
 Data_path = r"../AVE_Dataset"
 Video_path = r"../AVE_Dataset/Video"
@@ -63,7 +62,8 @@ def mp4_to_wav(videos_path, to_path, start_time, end_time):
 
 
 def generate_wav():
-    os.makedirs(Audio_path)
+    if not os.path.exists(Audio_path):
+        os.makedirs(Audio_path)
     data_list = readDataTxt(Data_path, "all")
     for data in data_list:
         mp4_to_wav(os.path.join(Video_path, data[0]), Audio_path, data[-2], data[-1])
@@ -99,13 +99,20 @@ def wav_to_h5(audio_path, to_path):
 
 
 def generate_h5():
-    os.makedirs(H5_path)
+    if not os.path.exists(H5_path):
+        os.makedirs(H5_path)
     data_list = readDataTxt(Data_path, "all")
     for data in data_list:
         wav_to_h5(os.path.join(Audio_path, data[0]), H5_path)
 
 
+def modefy_data():
+    generate_jpg()
+    generate_wav()
+    generate_h5()
+
+
 if __name__ == "__main__":
-    # generate_jpg()
-    # generate_wav()
+    generate_jpg()
+    generate_wav()
     generate_h5()

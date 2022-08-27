@@ -5,7 +5,7 @@ import os
 def get_parser():
     parser = argparse.ArgumentParser(description='CPL')  # 获得命令行参数
 
-    parser.add_argument("--dataset",type=str,default="AVE")
+    parser.add_argument("--dataset",type=str,default="AVE_Dataset")
     parser.add_argument("--Data_path", type=str, default=r"../AVE_Dataset")
     parser.add_argument("--Video_path", type=str, default=r"../AVE_Dataset/Video")
     parser.add_argument("--Pic_path", type=str, default=r"../AVE_Dataset/Picture")

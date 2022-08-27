@@ -11,6 +11,7 @@ import torch.nn.functional as F
 from utils.test_config import get_parser
 from utils.DataLoader import get_dataLoader
 from utils.avgMeter import AverageMeter
+from utils.AVE_modify import modefy_data
 
 
 def save_checkpoint(args, state, is_best, filename='checkpoint.pth.tar'):   # 函数：保存检查点（命令行参数，状态，是否是最优，文件名）
@@ -133,6 +134,8 @@ def train(args, save_index):
 
 
 if __name__ == '__main__':
+    modefy_data()
+
     args = get_parser()                          # 获得命令行参数
     print('Running parameters:\n', args)            # 打印
     if not os.path.exists(args.checkpoint_dir):       # 确保快照文件夹存在
