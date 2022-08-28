@@ -4,8 +4,9 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/AVE_Dataset" />
       <excludeFolder url="file://$MODULE_DIR$/S/runs" />
+      <excludeFolder url="file://$MODULE_DIR$/S/val" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.9 (pytorch_env)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (WJQ_STA_ENV)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

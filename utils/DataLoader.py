@@ -26,7 +26,7 @@ def get_dataLoader(args):
         img_train = AVEDataset(data_dir=args.Pic_path, mode="train", transform=tsfm_train)
         img_val = AVEDataset(data_dir=args.Pic_path, mode="test", transform=tsfm_train)
         train_loader = DataLoader(img_train, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-        val_loader = DataLoader(img_val, batch_size=8, shuffle=False, num_workers=args.num_workers)
+        val_loader = DataLoader(img_val, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
         return train_loader, val_loader
     else:
         img_test = AVEDataset(data_dir=args.Pic_path, mode="test", transform=tsfm_test)

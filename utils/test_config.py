@@ -15,13 +15,13 @@ def get_parser():
     parser.add_argument("--weight_decay", type=float, default=0.0005)
     parser.add_argument("--input_size", type=int, default=300)
     parser.add_argument("--crop_size", type=int, default=256)
-    parser.add_argument("--batch_size", type=int, default=8)
+    parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=0.00005)
     parser.add_argument("--decay_points", type=str, default='5,10')  # 衰变点
     parser.add_argument("--num_workers", type=int, default=0)
     parser.add_argument("--epoch", type=int, default=15)
     parser.add_argument("--global_counter", type=int, default=0)
-    parser.add_argument("--disp_interval", type=int, default=5)
+    parser.add_argument("--disp_interval", type=int, default=10)
 
     return parser.parse_args()
 
