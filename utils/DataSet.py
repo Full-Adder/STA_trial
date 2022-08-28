@@ -23,8 +23,8 @@ class AVEDataset(Dataset):  # 数据集类
         data_folder_list = dft.readDataTxt(os.path.join(data_dir, "../"), mode)
         self.data_list = []
         for idata in data_folder_list:
-            for i in range(idata[-2], idata[-1]):
-                self.data_list.append([os.path.join(data_dir, idata[0], "{:0>2d}.jpg".format(i)), idata[1]])
+            for idx in range(idata[-2], idata[-1]):
+                self.data_list.append([os.path.join(data_dir, idata[0], "{:0>2d}.jpg".format(idx)), idata[1]])
 
     def __len__(self):
         return len(self.data_list)
@@ -44,5 +44,6 @@ class AVEDataset(Dataset):  # 数据集类
 
 if __name__ == "__main__":
     x = AVEDataset("../AVE_Dataset/Picture", "train",transforms.ToTensor())
-    for i in x:
-        print(i[0])
+    print(len(x))
+    # for i in x:
+    #     print(i[0])

@@ -8,11 +8,11 @@ import resampy
 import numpy as np
 from utils.DataFromtxt import readDataTxt
 
-Data_path = r"../AVE_Dataset"
-Video_path = r"../AVE_Dataset/Video"
-Pic_path = r"../AVE_Dataset/Picture"
-Audio_path = r"../AVE_Dataset/Audio"
-H5_path = r"../AVE_Dataset/H5"
+Data_path = r"AVE_Dataset"
+Video_path = r"AVE_Dataset/Video"
+Pic_path = r"AVE_Dataset/Picture"
+Audio_path = r"AVE_Dataset/Audio"
+H5_path = r"AVE_Dataset/H5"
 
 
 def save_image(image, addr, num):
@@ -113,6 +113,4 @@ def modefy_data():
 
 
 if __name__ == "__main__":
-    generate_jpg()
-    generate_wav()
-    generate_h5()
+    modefy_data()
