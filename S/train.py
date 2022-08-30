@@ -11,23 +11,43 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 def train(args):
-    writer = SummaryWriter(args.SummaryWriter_dir)
 
     losses = AverageMeter()
-    total_epoch = args.epoch
 
-    train_loader = get_dataLoader(Pic_path=args.Pic_path, train_mode="val", STA_mode=args.STA_mode,
+    train_loader = get_dataLoader(Pic_path=args.Pic_path, train_mode="train", STA_mode=args.STA_mode,
                                   batch_size=args.batch_size, input_size=args.input_size,
                                   crop_size=args.crop_size)
     model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
 
-    for epoch in range(total_epoch):
+    best_pth = "./runs/model_best.pth.tar"
+    if os.path.exists(best_pth):
+        print("-----> find pretrained model weight in",best_pth)
+        state = torch.load(best_pth)
+        total_epoch = state['epoch'] + 1
+        if total_epoch >= args.epoch:
+            print("-----> has trained", total_epoch+1, 'in', best_pth)
+            print("-----> your arg.epoch:", args.epoch)
+            return
+        model.load_state_dict(state['state_dict'])
+        optimizer.load_state_dict(state['optimizer'])
+        print("-----> success load pretrained weight form ", best_pth)
+        print("-----> continue to train!")
+    else:
+        total_epoch = 0
+
+    writer = SummaryWriter(args.SummaryWriter_dir)
+
+    for epoch in range(total_epoch,args.epoch):
         model.train()
         losses.reset()
 
         for idx, dat in enumerate(train_loader):  # 从train_loader中获取数据
 
             img_name1, img1, inda1, label1 = dat
+
+            if epoch == 0 and idx == 0:
+                writer.add_graph(model, img1)
+
             label1 = label1.cuda(non_blocking=True)
             img1 = img1.cuda(non_blocking=True)
 
@@ -39,7 +59,7 @@ def train(args):
             optimizer.step()
 
             losses.update(loss_train.data.item(), img1.size()[0])
-            writer.add_scalars(args.dataset_name, {"train_loss": losses.avg}, epoch * len(train_loader) + idx)
+            writer.add_scalars(args.dataset_name, {"train_loss": losses.val}, epoch * len(train_loader) + idx)
 
             if (idx + 1) % args.disp_interval == 0:
                 dt = datetime.now().strftime("%y-%m-%d %H:%M:%S")
@@ -53,7 +73,7 @@ def train(args):
         if (epoch + 1) % args.val_Pepoch == 0:
             print("------------------------------val:start-----------------------------")
             with torch.no_grad():
-                test(model, args.Pic_path, True, epoch, args.batch_size, args.input_size, args.dataset_name)
+                test(model, args.Pic_path, True, epoch, args.batch_size, args.input_size, args.dataset_name,writer)
             print("------------------------------ val:end -----------------------------")
 
             if not os.path.exists(os.path.join('./val/model/')):
@@ -66,19 +86,19 @@ def train(args):
 
         if (epoch + 1) == args.epoch:
             save_checkpoint({
-                'epoch': epoch + 1,  # 当前轮数
+                'epoch': epoch,  # 当前轮数
                 'state_dict': model.state_dict(),  # 模型参数
                 'optimizer': optimizer.state_dict()  # 优化器参数
             },
-                is_best=True, checkpoint_dir=args.checkpoint_dir,
+                is_best=True, checkpoint_dir=args.Checkpoint_dir,
                 filename='%s_epoch_%d.pth' % (args.dataset_name, epoch + 1))
 
     writer.close()
 
+
 if __name__ == '__main__':
 
     args = get_parser()  # 获得命令行参数
-    print('Running parameters:\n', args)
     if not os.path.exists(args.SummaryWriter_dir):
         os.makedirs(args.SummaryWriter_dir)
     train(args)

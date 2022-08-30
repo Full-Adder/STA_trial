@@ -1,7 +1,8 @@
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
-from ConvGRU import ConvGRUCell
+from S.ConvGRU import ConvGRUCell
+
 # import torch.nn.init
 
 model_urls = {'resnext101_32x8d': 'https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth',
@@ -23,13 +24,13 @@ class SNetModel(nn.Module):  # 定义S
         self.features = nn.Sequential(*net[:7])  # 取前7组
 
         self.extra_convs = nn.Conv2d(1024, 28, 1)  # convs 输入通道数1024，输出通道数8，卷积核大小1*1
-        self.extra_conv_fusion = nn.Conv2d(all_channel * 2, all_channel, kernel_size=1,bias=True)
+        self.extra_conv_fusion = nn.Conv2d(all_channel * 2, all_channel, kernel_size=1, bias=True)
         self.extra_ConvGRU = ConvGRUCell(all_channel, all_channel, kernel_size=1)  # LSTM模块 28-->28
 
         self.extra_gate = nn.Conv2d(all_channel, 1, kernel_size=1, bias=False)  # conv2d:28-->1,1*1
         self.extra_gate_s = nn.Sigmoid()  # sigmoid()激活函数
 
-        self.extra_projf = nn.Conv2d(in_channels=all_channel, out_channels=all_channel // 2,kernel_size=1)
+        self.extra_projf = nn.Conv2d(in_channels=all_channel, out_channels=all_channel // 2, kernel_size=1)
         self.extra_projg = nn.Conv2d(in_channels=all_channel, out_channels=all_channel // 2, kernel_size=1)
         self.extra_projh = nn.Conv2d(in_channels=all_channel, out_channels=all_channel, kernel_size=1)
 
@@ -39,8 +40,6 @@ class SNetModel(nn.Module):  # 定义S
             elif isinstance(m, nn.BatchNorm2d):  # 是归一
                 m.weight.data.fill_(1)  # 权重w全1
                 m.bias.data.zero_()  # 偏置b为0
-
-
 
     def forward(self, input1):
 
@@ -104,6 +103,6 @@ class SNetModel(nn.Module):  # 定义S
 
 if __name__ == "__main__":
     model = SNetModel()
-    x = torch.randn([1,3,256,256])
+    x = torch.randn([1, 3, 256, 256])
     y = model(x)
     print(y)

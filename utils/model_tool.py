@@ -3,6 +3,7 @@ import torch
 import shutil  # 文件操作
 import torch.optim as optim
 from S.Smodel import SNetModel
+from torch.utils.tensorboard import SummaryWriter
 
 
 def get_model(STA_mode, lr=0.00005, weight_decay=0.0005):  # 获取 model
@@ -32,3 +33,4 @@ def save_checkpoint(state, is_best, checkpoint_dir, filename='checkpoint.pth.tar
         shutil.copyfile(save_path, os.path.join(checkpoint_dir, 'model_best.pth.tar'))  # 文件命名best复制到快照文件夹
     print("Congratulations! Your train code has been processed!")
     print("And your --epoch  --modul_weight  -- optim_weigh has been saved in ", save_path)
+

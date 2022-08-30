@@ -17,11 +17,11 @@ def get_parser():
     parser.add_argument("--weight_decay", type=float, default=0.0005)
     parser.add_argument("--input_size", type=int, default=300)
     parser.add_argument("--crop_size", type=int, default=256)
-    parser.add_argument("--batch_size", type=int, default=4)
+    parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=0.00005)
     parser.add_argument("--decay_points", type=str, default='5,10')  # 衰变点
-    parser.add_argument("--epoch", type=int, default=1)
-    parser.add_argument("--SummaryWriter_dir", type=str, default=r"../log")
+    parser.add_argument("--epoch", type=int, default=40)
+    parser.add_argument("--SummaryWriter_dir", type=str, default=r"./log")
     parser.add_argument("--global_counter", type=int, default=0)
     parser.add_argument("--disp_interval", type=int, default=10)
 
