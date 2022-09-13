@@ -3,6 +3,7 @@ import torch
 import shutil  # 文件操作
 import torch.optim as optim
 from S.Smodel import SNetModel
+from SA.SAmodel import SANetModel
 from torch.utils.tensorboard import SummaryWriter
 
 
@@ -10,8 +11,11 @@ def get_model(STA_mode, lr=0.00005, weight_decay=0.0005):  # 获取 model
     assert STA_mode in ["S", "ST", "SA", "STA"], "STA_mode must be S/ST/SA/STA"
     if STA_mode == "S":
         model = SNetModel()  # 获得S
+    elif STA_mode == "SA":
+        model = SANetModel()
     else:
-        model = SNetModel()
+        pass
+
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # GPU
     model = torch.nn.DataParallel(model).cuda()
     model.to(device)  # 加载到GPU:0

@@ -11,21 +11,21 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 def train(args):
-
     losses = AverageMeter()
 
-    train_loader = get_dataLoader(Pic_path=args.Pic_path, train_mode="train", STA_mode=args.STA_mode,
-                                  batch_size=args.batch_size, input_size=args.input_size,
-                                  crop_size=args.crop_size)
+    train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, train_mode="train",
+                                  STA_mode=args.STA_mode, batch_size=args.batch_size,
+                                  input_size=args.input_size, crop_size=args.crop_size)
+
     model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
 
     best_pth = "./runs/model_best.pth.tar"
     if os.path.exists(best_pth):
-        print("-----> find pretrained model weight in",best_pth)
+        print("-----> find pretrained model weight in", best_pth)
         state = torch.load(best_pth)
         total_epoch = state['epoch'] + 1
         if total_epoch >= args.epoch:
-            print("-----> has trained", total_epoch+1, 'in', best_pth)
+            print("-----> has trained", total_epoch + 1, 'in', best_pth)
             print("-----> your arg.epoch:", args.epoch)
             return
         model.load_state_dict(state['state_dict'])
@@ -37,21 +37,22 @@ def train(args):
 
     writer = SummaryWriter(args.SummaryWriter_dir)
 
-    for epoch in range(total_epoch,args.epoch):
+    for epoch in range(total_epoch, args.epoch):
         model.train()
         losses.reset()
 
         for idx, dat in enumerate(train_loader):  # 从train_loader中获取数据
 
-            img_name1, img1, inda1, label1 = dat
+            img_name1, img1, aud1, inda1, label1 = dat
 
             if epoch == 0 and idx == 0:
-                writer.add_graph(model, img1)
+                writer.add_graph(model, [img1, aud1])
 
             label1 = label1.cuda(non_blocking=True)
             img1 = img1.cuda(non_blocking=True)
+            aud1 = aud1.cuda(non_blocking=True)
 
-            x11, x22, map1, map2 = model(img1)
+            x11, x22, map1, map2 = model(img1, aud1)
             loss_train = F.multilabel_soft_margin_loss(x11, label1) + F.multilabel_soft_margin_loss(x22, label1)
 
             optimizer.zero_grad()
@@ -73,7 +74,8 @@ def train(args):
         if (epoch + 1) % args.val_Pepoch == 0:
             print("------------------------------val:start-----------------------------")
             with torch.no_grad():
-                test(model, args.Pic_path, True, epoch, args.batch_size, args.input_size, args.dataset_name,writer)
+                test(model, args.Pic_path, args.H5_path, True, epoch,
+                     args.batch_size, args.input_size, args.dataset_name, writer)
             print("------------------------------ val:end -----------------------------")
 
             if not os.path.exists(os.path.join('./val/model/')):

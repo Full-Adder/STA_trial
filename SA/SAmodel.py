@@ -1,29 +1,39 @@
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
-affine_par = True
-from ConvGRU import ConvGRUCell
-import cv2
-import numpy as np
+from utils.ConvGRU import ConvGRUCell
 from Soundmodel import SoundNet
 
+affine_par = True
+
+
 class SANetModel(nn.Module):
-    def  __init__(self, middir):
+    def __init__(self):
         super(SANetModel, self).__init__()
-        
+        all_channel = 28
+
+        Amodel = SoundNet()
+        checkpoint = torch.load('vggsound_netvlad.pth.tar')
+        Amodel.load_state_dict(checkpoint['model_state_dict'])
+        Amodel = list(Amodel.audnet.children())
+        self.audio_model = nn.Sequential(*Amodel[:9])
         self.extra_audio_d = nn.Linear(8192, 2048)
         self.Aup = nn.Sequential(nn.ConvTranspose2d(2048, 2048, kernel_size=3, stride=1, padding=0), nn.ReLU(True),
                                  nn.ConvTranspose2d(2048, 2048, kernel_size=3, stride=1, padding=0), nn.ReLU(True),
-                                 nn.ConvTranspose2d(2048, 2048, kernel_size=4, stride=1, padding=0)) 
+                                 nn.ConvTranspose2d(2048, 2048, kernel_size=4, stride=1, padding=0))
 
         self.extra_video_d = nn.Sequential(nn.Conv2d(2048, 2048, kernel_size=3, padding=1), nn.ReLU(True),
                                            nn.Conv2d(2048, 2048, kernel_size=3, padding=1), nn.ReLU(True),
                                            nn.Conv2d(2048, 2048, kernel_size=3, padding=1), nn.ReLU(True),
                                            nn.Conv2d(2048, 28, 1))
 
-        self.extra_convs = nn.Sequential(nn.Conv2d(2048, 28, 1), nn.Conv2d(28, 1, 1), nn.Sigmoid()) 
-        all_channel = 28
-        self.extra_conv_fusion = nn.Conv2d(all_channel*2, all_channel, kernel_size=1, bias=True)
+        # net = torch.hub.load('facebookresearch/WSL-Images', 'resnext101_32x8d_wsl')
+        net = torch.hub.load('../tmp/facebookresearch_WSL-Images_main', 'resnext101_32x8d_wsl', source='local')
+        net = list(net.children())
+        self.features = nn.Sequential(*net[:8])
+
+        self.extra_convs = nn.Sequential(nn.Conv2d(2048, 28, 1), nn.Conv2d(28, 1, 1), nn.Sigmoid())
+        self.extra_conv_fusion = nn.Conv2d(all_channel * 2, all_channel, kernel_size=1, bias=True)
         self.extra_ConvGRU = ConvGRUCell(all_channel, all_channel, kernel_size=1)
 
         self.extra_gate = nn.Conv2d(all_channel, 1, kernel_size=1, bias=False)
@@ -33,35 +43,24 @@ class SANetModel(nn.Module):
         self.extra_projg = nn.Conv2d(in_channels=all_channel, out_channels=all_channel // 2, kernel_size=1)
         self.extra_projh = nn.Conv2d(in_channels=all_channel, out_channels=all_channel, kernel_size=1)
 
-        self.middir = middir
-
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 m.weight.data.normal_(0, 0.01)
             elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.fill_(1)
-                m.bias.data.zero_()  
+                m.bias.data.zero_()
 
-        Amodel = SoundNet()
-        checkpoint = torch.load('vggsound_netvlad.pth.tar')
-        Amodel.load_state_dict(checkpoint['model_state_dict'])
-        Amodel = list(Amodel.audnet.children())
-        self.audio_model = nn.Sequential(*Amodel[:9])  
+    def forward(self, input1, audio1):
 
-        net = torch.hub.load('facebookresearch/WSL-Images', 'resnext101_32x8d_wsl')
-        net = list(net.children())
-        self.features = nn.Sequential(*net[:8]) 
-    		
-    def forward(self, idx,  img_name1, input1, audio1, epoch=1, label=None, index=None):
-        batch_num  = input1.size()[0]
-        a1 = self.audio_model(audio1.unsqueeze(1)) # [13, 8192]
-        a1 = self.extra_audio_d(a1).unsqueeze(2) # [16, 2048, 1] 
-        Aup = self.Aup(a1.unsqueeze(2))# 1,2048,8,8
+        a1 = self.audio_model(audio1.unsqueeze(1))  # [13, 8192]
+        a1 = self.extra_audio_d(a1).unsqueeze(2)  # [16, 2048, 1]
+        Aup = self.Aup(a1.unsqueeze(2))  # 1,2048,8,8
+        # print(Aup.size())
 
-        x1 = self.features(input1) # 1,2048,8,8
-        
+        x1 = self.features(input1)  # 1,2048,8,8
         x1 = self.extra_video_d(x1)
-        x2 = self.extra_conv_fusion(torch.cat((F.relu(x1+self.self_attention(x1)), F.relu(x1+x1*self.extra_convs(Aup))), 1))
+        x2 = self.extra_conv_fusion(
+            torch.cat((F.relu(x1 + self.self_attention(x1)), F.relu(x1 + x1 * self.extra_convs(Aup))), 1))
         x2 = self.extra_ConvGRU(x2, x1)
 
         self.map_1 = x1.clone()  # 1,28,32,32
@@ -84,14 +83,14 @@ class SANetModel(nn.Module):
         attention = torch.bmm(f.permute(0, 2, 1), g)  # B * (W * H) * (W * H)
         attention = F.softmax(attention, dim=1)  # 8,1024,1024
 
-        self_attetion = torch.bmm(h, attention)  # B * C * (W * H)
-        self_attetion = self_attetion.view(
-            m_batchsize, C, width, height)  # B * C * W * H
-        self_mask = self.extra_gate(self_attetion)  # [1, 1, 32, 32]
+        self_attention = torch.bmm(h, attention)  # B * C * (W * H)
+        self_attention = self_attention.view(m_batchsize, C, width, height)  # B * C * W * H
+        self_mask = self.extra_gate(self_attention)  # [1, 1, 32, 32]
         self_mask = self.extra_gate_s(self_mask)
+
         out = self_mask * x
         return out  # [1, 28, 32, 32]
- 
+
     def get_parameter_groups(self):
         groups = ([], [], [], [])
         for name, value in self.named_parameters():
@@ -106,3 +105,11 @@ class SANetModel(nn.Module):
                 else:
                     groups[1].append(value)
         return groups
+
+
+if __name__ == "__main__":
+    model = SANetModel()
+    img = torch.randn([1, 3, 256, 256])
+    aud = torch.randn([1, 81, 199])
+    y = model(img, aud)
+    print(y)

@@ -32,6 +32,7 @@ def test(model, Pic_path, is_val, save_index, batch_size, input_size, dataset_na
             writer.add_graph(model, img1)
 
         label1 = label1.cuda(non_blocking=True)
+        img1 = img1.cuda(non_blocking=True)
 
         x11, x22, map1, map2 = model(img1)
 

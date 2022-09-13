@@ -12,8 +12,9 @@ from datetime import datetime
 from utils.model_tool import get_model
 
 
-def test(model, Pic_path, is_val, save_index, batch_size, input_size, dataset_name, Summary_Writer,
-         test_re_dir=None):
+def test(model, Pic_path, H5_path, is_val, save_index, batch_size,
+         input_size, dataset_name, Summary_Writer, test_re_dir=None):
+
     model = model.eval()
 
     if is_val:
@@ -21,19 +22,21 @@ def test(model, Pic_path, is_val, save_index, batch_size, input_size, dataset_na
     else:
         save_path_hh = test_re_dir
 
-    test_loader = get_dataLoader(Pic_path=Pic_path, train_mode="test", STA_mode="S",
+    test_loader = get_dataLoader(Pic_path=Pic_path, H5_path=H5_path, train_mode="test", STA_mode="SA",
                                  batch_size=batch_size, input_size=input_size)  # 获取测试集
 
     for idx_test, dat_test in enumerate(test_loader):
 
-        img_name1, img1, inda1, label1 = dat_test
+        img_name1, img1, aud1, inda1, label1 = dat_test
 
         if save_index == 0 and idx_test == 0:
             writer.add_graph(model, img1)
 
         label1 = label1.cuda(non_blocking=True)
+        img1 = img1.cuda(non_blocking=True)
+        aud1 = aud1.cuda(non_blocking=True)
 
-        x11, x22, map1, map2 = model(img1)
+        x11, x22, map1, map2 = model(img1, aud1)
 
         loss_t = F.multilabel_soft_margin_loss(x11, label1) + F.multilabel_soft_margin_loss(x22, label1)
 
@@ -90,7 +93,7 @@ def test(model, Pic_path, is_val, save_index, batch_size, input_size, dataset_na
 
 if __name__ == '__main__':
     args = get_parser()
-    net, _ = get_model("S")
+    net, _ = get_model("SA")
     best_pth = "./runs/model_best.pth.tar"
     if os.path.exists(best_pth):
         state = torch.load(best_pth)
@@ -112,6 +115,7 @@ if __name__ == '__main__':
     for i in range(5):
         test(model=net, Pic_path=args.Pic_path, is_val=True, save_index=i, batch_size=args.batch_size,
              input_size=args.input_size, dataset_name=args.dataset_name, Summary_Writer=writer)
+
     writer.close()
 
 #  tensorboard.exe --logdir ./ --samples_per_plugin images=100
