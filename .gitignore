@@ -8,3 +8,7 @@
 /S/log/
 /tmp/
 /SA/vggsound_netvlad.pth.tar
+/SA/log/
+/SA/runs/
+/SA/val/
+/SA/val_re/

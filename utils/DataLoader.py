@@ -16,7 +16,7 @@ def get_dataLoader(Pic_path=r"../AVE_Dataset/Video", H5_path=r"../AVE_Dataset/H5
                                      transforms.Normalize(mean_vals, std_vals),
                                      ])
 
-    tsfm_test = transforms.Compose([transforms.Resize((input_size, input_size)),
+    tsfm_test = transforms.Compose([transforms.Resize((crop_size, crop_size)),
                                     transforms.ToTensor(),
                                     transforms.Normalize(mean_vals, std_vals),
                                     ])
@@ -48,6 +48,7 @@ if __name__ == "__main__":
 
         img_name1, img1, aud1, inda1, label1 = a
         print(img_name1[0])
+        print(img_name1[0][-18:-7])
         print(img1.size(), aud1.size())
         i += 1
         if i>3:

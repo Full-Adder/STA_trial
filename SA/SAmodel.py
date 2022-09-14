@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 import torch.nn.functional as F
 from utils.ConvGRU import ConvGRUCell
-from Soundmodel import SoundNet
+from SA.Soundmodel import SoundNet
 
 affine_par = True
 
