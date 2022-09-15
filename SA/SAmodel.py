@@ -22,26 +22,28 @@ class SANetModel(nn.Module):
                                  nn.ConvTranspose2d(2048, 2048, kernel_size=3, stride=1, padding=0), nn.ReLU(True),
                                  nn.ConvTranspose2d(2048, 2048, kernel_size=4, stride=1, padding=0))
 
-        self.extra_video_d = nn.Sequential(nn.Conv2d(2048, 2048, kernel_size=3, padding=1), nn.ReLU(True),
-                                           nn.Conv2d(2048, 2048, kernel_size=3, padding=1), nn.ReLU(True),
-                                           nn.Conv2d(2048, 2048, kernel_size=3, padding=1), nn.ReLU(True),
-                                           nn.Conv2d(2048, 28, 1))
 
         # net = torch.hub.load('facebookresearch/WSL-Images', 'resnext101_32x8d_wsl')
         net = torch.hub.load('../tmp/facebookresearch_WSL-Images_main', 'resnext101_32x8d_wsl', source='local')
         net = list(net.children())
         self.features = nn.Sequential(*net[:8])
 
-        self.extra_convs = nn.Sequential(nn.Conv2d(2048, 28, 1), nn.Conv2d(28, 1, 1), nn.Sigmoid())
-        self.extra_conv_fusion = nn.Conv2d(all_channel * 2, all_channel, kernel_size=1, bias=True)
-        self.extra_ConvGRU = ConvGRUCell(all_channel, all_channel, kernel_size=1)
+        self.extra_video_d = nn.Sequential(nn.Conv2d(2048, 2048, kernel_size=3, padding=1), nn.ReLU(True),
+                                           nn.Conv2d(2048, 2048, kernel_size=3, padding=1), nn.ReLU(True),
+                                           nn.Conv2d(2048, 2048, kernel_size=3, padding=1), nn.ReLU(True),
+                                           nn.Conv2d(2048, 28, 1))
 
-        self.extra_gate = nn.Conv2d(all_channel, 1, kernel_size=1, bias=False)
-        self.extra_gate_s = nn.Sigmoid()
+        self.extra_convs = nn.Sequential(nn.Conv2d(2048, 28, 1), nn.Conv2d(28, 1, 1), nn.Sigmoid())
 
         self.extra_projf = nn.Conv2d(in_channels=all_channel, out_channels=all_channel // 2, kernel_size=1)
         self.extra_projg = nn.Conv2d(in_channels=all_channel, out_channels=all_channel // 2, kernel_size=1)
         self.extra_projh = nn.Conv2d(in_channels=all_channel, out_channels=all_channel, kernel_size=1)
+
+        self.extra_gate = nn.Conv2d(all_channel, 1, kernel_size=1, bias=False)
+        self.extra_gate_s = nn.Sigmoid()
+
+        self.extra_conv_fusion = nn.Conv2d(all_channel * 2, all_channel, kernel_size=1, bias=True)
+        self.extra_ConvGRU = ConvGRUCell(all_channel, all_channel, kernel_size=1)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -59,8 +61,8 @@ class SANetModel(nn.Module):
 
         x1 = self.features(input1)  # 1,2048,8,8
         x1 = self.extra_video_d(x1)
-        x2 = self.extra_conv_fusion(
-            torch.cat((F.relu(x1 + self.self_attention(x1)), F.relu(x1 + x1 * self.extra_convs(Aup))), 1))
+        x2 = self.extra_conv_fusion(torch.cat((F.relu(x1 + self.self_attention(x1)),
+                                               F.relu(x1 + x1 * self.extra_convs(Aup))), 1))
         x2 = self.extra_ConvGRU(x2, x1)
 
         self.map_1 = x1.clone()  # 1,28,32,32
