@@ -275,21 +275,21 @@ for epoch in range(total_epoch,args.epoch):
 
 训练轮数：20
 
-![07](./readme_pic/-7bvjkedz-Q\07.jpg)
+![07](./readme_pic/-7bvjkedz-Q/07.jpg)
 
-![07](./readme_pic/-7bvjkedz-Q\07.png)
+![07](./readme_pic/-7bvjkedz-Q/07.png)
 
-![09](./readme_pic/-7bvjkedz-Q\09.jpg)
+![09](./readme_pic/-7bvjkedz-Q/09.jpg)
 
-![09](./readme_pic/-7bvjkedz-Q\09.png)
+![09](./readme_pic/-7bvjkedz-Q/09.png)
 
-![00](./readme_pic/-9xKC8r1Ww0\00.jpg)
+![00](./readme_pic/-9xKC8r1Ww0/00.jpg)
 
-![00](./readme_pic/-9xKC8r1Ww0\00.png)
+![00](./readme_pic/-9xKC8r1Ww0/00.png)
 
-![07](./readme_pic/--sbZ5YMSm4\07.jpg)
+![07](./readme_pic/--sbZ5YMSm4/07.jpg)
 
-![07](./readme_pic/--sbZ5YMSm4\07.png)
+![07](./readme_pic/--sbZ5YMSm4/07.png)
 
 训练时的验证集损失：
 

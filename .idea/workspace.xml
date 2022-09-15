@@ -1,75 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0c8a3c88-46e0-4914-b539-12283830cfc0" name="变更" comment="添加Readme">
-      <change afterPath="$PROJECT_DIR$/ST/STModel.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ST/test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ST/train.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/00.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/00.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/01.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/01.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/02.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/02.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/03.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/03.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/04.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/04.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/05.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/05.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/06.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/06.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/07.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/--sbZ5YMSm4/07.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/00.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/00.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/01.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/01.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/02.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/02.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/03.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/03.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/04.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/04.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/05.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/05.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/06.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/06.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/07.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/07.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/08.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/08.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/09.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-7bvjkedz-Q/09.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/00.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/00.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/01.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/01.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/02.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/02.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/03.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/03.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/04.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/04.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/05.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/05.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/06.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/06.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/07.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/07.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/08.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/08.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/09.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/-9xKC8r1Ww0/09.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/image-20220831140650841.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/image-20220831140834583.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/image-20220831151542976.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/readme_pic/image-20220831172848838.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/my_STA.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/my_STA.iml" afterDir="false" />
+    <list default="true" id="0c8a3c88-46e0-4914-b539-12283830cfc0" name="变更" comment="添加了ST,还需要修改">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/Readme.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/DataSet.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/DataSet.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -305,6 +238,7 @@
       <workItem from="1663128878966" duration="8327000" />
       <workItem from="1663164657020" duration="613000" />
       <workItem from="1663220062792" duration="696000" />
+      <workItem from="1663238604340" duration="982000" />
     </task>
     <task id="LOCAL-00001" summary="hello world">
       <created>1661611421441</created>
@@ -369,7 +303,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663121461772</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="添加了ST,还需要修改">
+      <created>1663238725597</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1663238725597</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -397,7 +338,8 @@
     <MESSAGE value="跑通SA代码,还需要修改" />
     <MESSAGE value="完成SA代码" />
     <MESSAGE value="添加Readme" />
-    <option name="LAST_COMMIT_MESSAGE" value="添加Readme" />
+    <MESSAGE value="添加了ST,还需要修改" />
+    <option name="LAST_COMMIT_MESSAGE" value="添加了ST,还需要修改" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/my_STA$test_config.coverage" NAME="test_config 覆盖结果" MODIFIED="1661594090197" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
