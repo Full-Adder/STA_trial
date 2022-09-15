@@ -64,7 +64,7 @@ class AVEDataset(Dataset):  # 数据集类
 
 if __name__ == "__main__":
     x = AVEDataset(pic_dir="../AVE_Dataset/Picture", h5_dir=r"../AVE_Dataset/H5",
-                   mode="train", transform=transforms.ToTensor(), STA_mode="SA")
+                   mode="train", transform=transforms.ToTensor(), STA_mode="S")
     print(len(x))
     for i in x:
         print(i)

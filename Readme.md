@@ -16,9 +16,9 @@
 
 1. *SCAM training*
 
-> **Course** ：分别训练 $S_{coarse}$, $SA_{coarse}$, $ST_{coarse}$ ，输入大小256确保物体定位准确。
+> **Course** ：分别训练 $ S_{coarse} $, $ {SA}_{coarse} $, $ {ST}_{coarse} $ ，输入大小256确保物体定位准确。
 >
-> **Fine** ：分别再训练  $S_{fine}$, $SA_{fine}$, $ST_{fine}$ ，输入大小356确保区域定位准确。
+> **Fine** ：分别再训练  $ S_{fine} $, $ {SA}_{fine} $, $ {ST}_{fine} $ ，输入大小356确保区域定位准确。
 
 2. *pseudoGT generation*
 
@@ -30,7 +30,7 @@
 
 项目目录如下：
 
-<img src="C:\Users\Full_\AppData\Roaming\Typora\typora-user-images\image-20220831140650841.png" alt="image-20220831140650841" style="zoom: 50%;" />
+<img src="./readme_pic/image-20220831140650841.png" alt="image-20220831140650841" style="zoom: 50%;" />
 
 
 
@@ -44,11 +44,11 @@ AVE数据集结构如下：
       │  trainSet.txt
       │  valSet.txt
       └─AVE
-	---1_cCGK4M.mp4
-	--12UOziMF0.mp4
-	--5zANFBYzQ.mp4
-	--9O4XZOge4.mp4
-	--bSurT-1Ak.mp4
+        ---1_cCGK4M.mp4
+        --12UOziMF0.mp4
+        --5zANFBYzQ.mp4
+        --9O4XZOge4.mp4
+        --bSurT-1Ak.mp4
 ```
 AVE 数据集包含4096个时长为10s的MP4视频，每个视频被唯一地标注了一个视频种类标签，数据集共被标注了28个视频分类标签。视频的类别等信息存储在$Annotations.txt$, $test.txt$, $train.txt$ 中，存储数据如下：
 
@@ -175,10 +175,10 @@ def get_dataLoader(Pic_path, train_mode, STA_mode, batch_size,
 
 #### S model
 
-![image-20220831151542976](C:\Users\Full_\AppData\Roaming\Typora\typora-user-images\image-20220831151542976.png)
+![image-20220831151542976](./readme_pic/image-20220831151542976.png)
 
 | x_name      | later_name                   | detail                                    | output_size         |
-| ----------- | ---------------------------- | ----------------------------------------- | ------------------- |
+|-------------|------------------------------|-------------------------------------------|---------------------|
 | x           | input                        | none                                      | [1, 3, 256, 256]    |
 | x1          | features(x)                  | nn.Sequential(*ResNetX[:7])               | [1, 1024, 19, 19]   |
 | x11         | extra_convs(x1)              | nn.Conv2d(1024, 28, 1)                    | [1, 28, 19 ,19]     |
@@ -186,15 +186,15 @@ def get_dataLoader(Pic_path, train_mode, STA_mode, batch_size,
 | _f          | extra_projf(x11)             | Conv2d(28, 14, 1).view(b, -1, w* h)       | [1, 14, 19*19]      |
 | _g          | extra_projg(x11)             | Conv2d(28, 14, 1).view(b, -1, w* h)       | [1, 14, 19*19]      |
 | _h          | extra_projh(x11)             | Conv2d(28, 28, 1).view(b, -1, w* h)       | [1, 28, 19*19]      |
-| _atte       | bmm-矩阵相乘                 | softmax(tor.bmm(f[0,2,1],g))              | [1, 19\*19, 19\*19] |
-| _self_atte  | 相乘后展开                   | bmm(h, atte).view(b, c, w,h)              | [1，28, 19, 19]     |
+| _atte       | bmm-矩阵相乘                     | softmax(tor.bmm(f[0,2,1],g))              | [1, 19\*19, 19\*19] |
+| _self_atte  | 相乘后展开                        | bmm(h, atte).view(b, c, w,h)              | [1，28, 19, 19]      |
 | _self_mask  | extra_gate(self_atte)        | sogmoid(Conv2d(28, 1, 1))                 | [1, 1, 19, 19]      |
 |             |                              | self_mask * x11                           | [1, 28, 19, 19]     |
 | x2          | extra_conv_fusion(x11,x_att) | Conv2d(56, 28, 1, True)                   | [1, 28, 19, 19]     |
 | x22         | extra_ConvGRU(x2,x11)        |                                           |                     |
-| _update     | tor.cat(x2,x11)后            | sigmoid(Conv2d(56, 28,1))                 | [1, 28, 19, 19]     |
-| _reset      | tor.cat(x2,x11)后            | sigmoid(Conv2d(56, 28,1))                 | [1, 28, 19, 19]     |
-| _out_inputs | cat([x11, x_att * reset]     | tanh(Conv2d(56, 28,1))                    | [1, 28, 19, 19]     |
+| _update     | tor.cat(x2,x11)后             | sigmoid(Conv2d(56, 28,1))                 | [1, 28, 19, 19]     |
+| _reset      | tor.cat(x2,x11)后             | sigmoid(Conv2d(56, 28,1))                 | [1, 28, 19, 19]     |
+| _out_inputs | cat([x11, x_att * reset])    | tanh(Conv2d(56, 28,1))                    | [1, 28, 19, 19]     |
 |             |                              | x_att* (1 - update) + out_inputs * update | [1, 28, 19, 19]     |
 | map_1       |                              | x11.clone()                               |                     |
 | x1ss        |                              | avg_pool2d(x11, 19, 19).view(-1, 28)      | [1, 28]             |
@@ -221,7 +221,7 @@ loss_train = F.multilabel_soft_margin_loss(x1ss, label1) +
 
 $MultiLabelSoftMarginLoss$ 针对多分类，且每个样本只能属于一个类的情形
 
-$\operatorname{$MultiLabelSoftMarginLoss}(x, y)=-\frac{1}{C} * \sum_{i} y[i] * \log \left((1+\exp (-x[i]))^{-1}\right)+(1-y[i]) * \log \left(\frac{\exp (-x[i])}{1+\exp (-x[i])}\right) $
+$\operatorname{MultiLabelSoftMarginLoss}(x, y)=-\frac{1}{C} * \sum_{i} y[i] * \log \left((1+\exp (-x[i]))^{-1}\right)+(1-y[i]) * \log \left(\frac{\exp (-x[i])}{1+\exp (-x[i])}\right) $
 
 相当于对min-batch个多个交叉熵损失求平均值。
 
@@ -275,25 +275,25 @@ for epoch in range(total_epoch,args.epoch):
 
 训练轮数：20
 
-![07](C:\Users\Full_\Desktop\CPL代码阅读\-7bvjkedz-Q\07.jpg)
+![07](./readme_pic/-7bvjkedz-Q\07.jpg)
 
-![07](C:\Users\Full_\Desktop\CPL代码阅读\-7bvjkedz-Q\07.png)
+![07](./readme_pic/-7bvjkedz-Q\07.png)
 
-![09](C:\Users\Full_\Desktop\CPL代码阅读\-7bvjkedz-Q\09.jpg)
+![09](./readme_pic/-7bvjkedz-Q\09.jpg)
 
-![09](C:\Users\Full_\Desktop\CPL代码阅读\-7bvjkedz-Q\09.png)
+![09](./readme_pic/-7bvjkedz-Q\09.png)
 
-![00](C:\Users\Full_\Desktop\CPL代码阅读\-9xKC8r1Ww0\00.jpg)
+![00](./readme_pic/-9xKC8r1Ww0\00.jpg)
 
-![00](C:\Users\Full_\Desktop\CPL代码阅读\-9xKC8r1Ww0\00.png)
+![00](./readme_pic/-9xKC8r1Ww0\00.png)
 
-![07](C:\Users\Full_\Desktop\CPL代码阅读\--sbZ5YMSm4\07.jpg)
+![07](./readme_pic/--sbZ5YMSm4\07.jpg)
 
-![07](C:\Users\Full_\Desktop\CPL代码阅读\--sbZ5YMSm4\07.png)
+![07](./readme_pic/--sbZ5YMSm4\07.png)
 
 训练时的验证集损失：
 
-![image-20220831172848838](C:\Users\Full_\AppData\Roaming\Typora\typora-user-images\image-20220831172848838.png)
+![image-20220831172848838](./readme_pic/image-20220831172848838.png)
 
 
 
