@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0c8a3c88-46e0-4914-b539-12283830cfc0" name="变更" comment="修复图片">
-      <change afterPath="$PROJECT_DIR$/readme_pic/SA_model.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/Readme.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SA/SAmodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/SA/SAmodel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readme_pic/image-20220831151542976.png" beforeDir="false" afterPath="$PROJECT_DIR$/readme_pic/S_model.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readme_pic/image-20220831172848838.png" beforeDir="false" afterPath="$PROJECT_DIR$/readme_pic/S_val_loss.png" afterDir="false" />
-    </list>
+    <list default="true" id="0c8a3c88-46e0-4914-b539-12283830cfc0" name="变更" comment="更新了readme" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -50,15 +43,15 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/WorkPlace/Python/STANet-main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/WorkPlace/Python/my_STA/readme_pic&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\WorkPlace\Python\my_STA\ST" />
       <recent name="D:\WorkPlace\Python\my_STA\readme_pic" />
+      <recent name="D:\WorkPlace\Python\my_STA\ST" />
       <recent name="D:\WorkPlace\Python\my_STA" />
       <recent name="D:\WorkPlace\Python\my_STA\AVE_Dataset" />
       <recent name="D:\WorkPlace\Python\my_STA\SA" />
@@ -245,7 +238,7 @@
       <workItem from="1663220062792" duration="696000" />
       <workItem from="1663238604340" duration="1738000" />
       <workItem from="1663249706594" duration="969000" />
-      <workItem from="1663250697246" duration="10479000" />
+      <workItem from="1663250697246" duration="10814000" />
     </task>
     <task id="LOCAL-00001" summary="hello world">
       <created>1661611421441</created>
@@ -324,7 +317,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663242793871</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="更新了readme">
+      <created>1663262545376</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1663262545376</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -354,7 +354,8 @@
     <MESSAGE value="添加Readme" />
     <MESSAGE value="添加了ST,还需要修改" />
     <MESSAGE value="修复图片" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复图片" />
+    <MESSAGE value="更新了readme" />
+    <option name="LAST_COMMIT_MESSAGE" value="更新了readme" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/my_STA$test_config.coverage" NAME="test_config 覆盖结果" MODIFIED="1661594090197" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />

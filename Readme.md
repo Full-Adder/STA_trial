@@ -35,7 +35,7 @@
 AVE数据集结构如下：
 
 ```
-│  Annotations.txt
+      │  Annotations.txt
       │  ReadMe.txt
       │  testSet.txt
       │  trainSet.txt
