@@ -11,7 +11,7 @@ def get_parser():
     parser.add_argument("--Pic_path", type=str, default=r"../AVE_Dataset/Picture")
     parser.add_argument("--H5_path", type=str, default=r"../AVE_Dataset/H5")
     parser.add_argument("--train_mode", type=str, default=r"train", help="train/test/val")
-    parser.add_argument("--STA_mode", type=str, default=r"SA", help="S/ST/SA/STA")
+    parser.add_argument("--STA_mode", type=str, default=r"ST", help="S/ST/SA/STA")
     parser.add_argument("--Checkpoint_dir", type=str, default='./runs/')
     parser.add_argument("--val_Pepoch",type=int,default=1)
     parser.add_argument("--weight_decay", type=float, default=0.0005)
@@ -23,7 +23,7 @@ def get_parser():
     parser.add_argument("--epoch", type=int, default=1)
     parser.add_argument("--SummaryWriter_dir", type=str, default=r"./log")
     parser.add_argument("--global_counter", type=int, default=0)
-    parser.add_argument("--disp_interval", type=int, default=10)
+    parser.add_argument("--disp_interval", type=int, default=5)
 
     print(parser.parse_args())
 

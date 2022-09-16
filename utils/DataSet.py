@@ -28,38 +28,51 @@ class AVEDataset(Dataset):  # 数据集类
         data_folder_list = dft.readDataTxt(os.path.join(self.pic_dir, "../"), mode)
         self.data_list = []
         for idata in data_folder_list:
-            for idx in range(idata[-2], idata[-1]):
-                self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
+            if self.STA_mode == "S" or self.STA_mode == "SA":
+                for idx in range(idata[-2], idata[-1]):
+                    self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
+            else:
+                for idx in range(idata[-2] + 1, idata[-1] - 1):
+                    self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
 
     def __len__(self):
         return len(self.data_list)
 
     def __getitem__(self, idx):
         data = self.data_list[idx]
+        video_name, id = data[0][:11], int(data[0][-2:])
 
-        img_path = os.path.join(self.pic_dir, data[0]+".jpg")  # 图片绝对地址
+        img_path = os.path.join(self.pic_dir, video_name, "%02d" % id + ".jpg")  # 图片绝对地址
         image = Image.open(img_path).convert('RGB')  # 打开图片，并转化为RGB格式
         image = self.transform(image)  # 将图片转化为tensor
 
         class_id = int(data[1])  # 获得图像标签
-        label = np.zeros(len(self.class_dir), dtype=np.float32)
-        label[class_id] = 1  # one-hot编码
+        onehot_label = np.zeros(len(self.class_dir), dtype=np.float32)
+        onehot_label[class_id] = 1  # one-hot编码
 
         if self.STA_mode == "S":
-            return data[0], image, class_id, label  # 返回 图片地址 图片tensor 标签 onehot标签
+            return data[0], image, class_id, onehot_label  # 返回 图片地址 图片tensor 标签 onehot标签
 
         elif self.STA_mode == "SA":
-            h5_path = os.path.join(self.h5_dir, data[0]+".h5")
+            h5_path = os.path.join(self.h5_dir, data[0] + ".h5")
             with h5py.File(h5_path, 'r') as hf:
                 audio_features = np.float32(hf['dataset'][:])  # 5,128
             audio = torch.from_numpy(audio_features).float()
-            return data[0], image, audio, class_id, label  # 返回 图片地址 图片tensor 标签 onehot标签
+            return data[0], image, audio, class_id, onehot_label  # 返回 图片地址 图片tensor 标签 onehot标签
 
-        elif self.STA_mode == "ST":
-            pass
+        else:
+            img_bef_path = os.path.join(self.pic_dir, video_name, "%02d" % (id - 1) + ".jpg")  # 前一张图片的地址
+            img_aft_path = os.path.join(self.pic_dir, video_name, "%02d" % (id + 1) + ".jpg")  # 后一张图片的地址
+            image_bef = Image.open(img_bef_path).convert('RGB')
+            image_aft = Image.open(img_aft_path).convert('RGB')
+            image_bef = self.transform(image_bef)
+            image_aft = self.transform(image_aft)
 
-        else:   # "STA"
-            pass
+            if self.STA_mode == "ST":
+                return data[0], image_bef, image, image_aft, class_id, onehot_label
+
+            else:  # "STA"
+                pass
 
 
 if __name__ == "__main__":

@@ -4,22 +4,23 @@ import shutil  # 文件操作
 import torch.optim as optim
 from S.Smodel import SNetModel
 from SA.SAmodel import SANetModel
+from ST.STModel import STNetModel
 from torch.utils.tensorboard import SummaryWriter
 
 
 def get_model(STA_mode, lr=0.00005, weight_decay=0.0005):  # 获取 model
     assert STA_mode in ["S", "ST", "SA", "STA"], "STA_mode must be S/ST/SA/STA"
+    model = None
     if STA_mode == "S":
         model = SNetModel()  # 获得S
     elif STA_mode == "SA":
         model = SANetModel()
-    else:
-        pass
+    elif STA_mode == "ST":
+        model = STNetModel()
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # GPU
-    model = torch.nn.DataParallel(model).cuda()
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)  # 加载到GPU:0
-    param_groups = model.module.get_parameter_groups()  # 获取 1作者定义的网络的权重 2作者定义的网罗的偏置 3resnext的权重 4resnext的偏置
+    param_groups = model.get_parameter_groups()  # 获取 1作者定义的网络的权重 2作者定义的网罗的偏置 3resnext的权重 4resnext的偏置
     optimizer = optim.SGD([  # 随机梯度下降
         {'params': param_groups[0], 'lr': lr},  # 对于不同类型参数用不同的学习率
         {'params': param_groups[1], 'lr': 2 * lr},

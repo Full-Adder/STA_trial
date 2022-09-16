@@ -1,5 +1,7 @@
 # STA实验报告
 
+
+
 [1] [作者的代码:guotaowang/STANet (github.com)](https://github.com/guotaowang/STANet)
 
 [2] [修改后本实验代码:Full-Adder/STA_trial (github.com)](https://github.com/Full-Adder/STA_trial)
@@ -8,7 +10,7 @@
 
 此次实验是论文《[From Semantic Categories to Fixations: A Novel Weakly-supervised Visual-auditory Saliency Detection Approach ](https://openaccess.thecvf.com/content/CVPR2021/papers/Wang_From_Semantic_Categories_to_Fixations_A_Novel_Weakly-Supervised_Visual-Auditory_Saliency_CVPR_2021_paper.pdf)》的代码实现。
 
-针对目前只有少数带有真实注视点视听序列的问题，论文中提出了一种弱监督的方式，使用一种遵循粗到细($coarse-to-fine$)策略的选择性类激活映射(SCAM)，仅通过视频类别标签来获得空间S-时间T-音频A环境中最显著的区域。并且预测结果后续可以作为伪-真实数据训练一个新的STA网络。
+针对目前只有少数带有真实注视点视听序列的问题，论文中提出了一种弱监督的方式，使用一种遵循粗到细(coarse-to-fine)策略的选择性类激活映射(SCAM)，仅通过视频类别标签来获得空间S-时间T-音频A环境中最显著的区域。并且预测结果后续可以作为伪-真实数据训练一个新的STA网络。
 
 实验总体可以分为三步：
 
@@ -52,7 +54,7 @@ AVE 数据集包含4096个时长为10s的MP4视频，每个视频被唯一地标
 
 
 | Category        | VideoID     | Quality | StartTime | EndTime |
-| --------------- | ----------- | ------- | --------- | ------- |
+|-----------------|-------------|---------|-----------|---------|
 | Church bell     | RUhOCu3LNXM | good    | 0         | 10      |
 | Church bell     | MH3m4AwEcRY | good    | 6         | 8       |
 | Acoustic guitar | -AFx6goDrOw | good    | 0         | 10      |
@@ -176,9 +178,7 @@ def get_dataLoader(Pic_path=r"../AVE_Dataset/Video", H5_path=r"../AVE_Dataset/H5
         return val_loader
 ```
 
-### 网络模型结构
-
-#### S model
+### S model
 
 ![image-20220831151542976](./readme_pic/S_model.png)
 
@@ -229,7 +229,9 @@ $\operatorname{MultiLabelSoftMarginLoss}(x, y)=-\frac{1}{C} * \sum_{i} y[i] * \l
 
 相当于对$min-batch$个多个交叉熵损失求平均值。
 
-#### SA model
+
+
+### SA model
 
 ![SA_model](./readme_pic/SA_model.png)
 
@@ -292,6 +294,8 @@ $\operatorname{MultiLabelSoftMarginLoss}(x, y)=-\frac{1}{C} * \sum_{i} y[i] * \l
 
 $atts = (map1[i] + map2[i]) / 2$  作为CAM结果。
 
+
+
 ##### loss
 
 SA的loss与S模型的loss一样：
@@ -300,6 +304,8 @@ SA的loss与S模型的loss一样：
 loss_train = F.multilabel_soft_margin_loss(x1ss, label1) +
 			F.multilabel_soft_margin_loss(x2ss, label1)
 ```
+
+
 
 ### 模型训练与测试
 

@@ -11,7 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 def train(args):
-
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     losses = AverageMeter()
 
     train_loader = get_dataLoader(Pic_path=args.Pic_path, train_mode="train", STA_mode=args.STA_mode,
@@ -21,11 +21,11 @@ def train(args):
 
     best_pth = "./runs/model_best.pth.tar"
     if os.path.exists(best_pth):
-        print("-----> find pretrained model weight in",best_pth)
+        print("-----> find pretrained model weight in", best_pth)
         state = torch.load(best_pth)
         total_epoch = state['epoch'] + 1
         if total_epoch >= args.epoch:
-            print("-----> has trained", total_epoch+1, 'in', best_pth)
+            print("-----> has trained", total_epoch + 1, 'in', best_pth)
             print("-----> your arg.epoch:", args.epoch)
             return
         model.load_state_dict(state['state_dict'])
@@ -37,28 +37,34 @@ def train(args):
 
     writer = SummaryWriter(args.SummaryWriter_dir)
 
-    for epoch in range(total_epoch,args.epoch):
+    for epoch in range(total_epoch, args.epoch):
         model.train()
         losses.reset()
 
-        for idx, dat in enumerate(train_loader):  # 从train_loader中获取数据
+        for idx, data in enumerate(train_loader):  # 从train_loader中获取数据
 
-            img_name1, img1, inda1, label1 = dat
+            img_name, img_bef, img_now, img_aft, class_id, onehot_label = data
+
+            img_bef = img_bef.to(device)
+            img_now = img_now.to(device)
+            img_aft = img_aft.to(device)
+            class_id = class_id.to(device)
 
             if epoch == 0 and idx == 0:
-                writer.add_graph(model, img1)
+                writer.add_graph(model, [img_bef, img_now, img_aft])
 
-            label1 = label1.cuda(non_blocking=True)
-            img1 = img1.cuda(non_blocking=True)
+            x11, x1, x22, x2, x33, x3, map1, map2 = model(img_bef, img_now, img_aft)
 
-            x11, x22, map1, map2 = model(img1)
-            loss_train = F.multilabel_soft_margin_loss(x11, label1) + F.multilabel_soft_margin_loss(x22, label1)
+            loss_train = 0.4 * (F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
+                                + F.cross_entropy(x33, class_id)) \
+                         + 0.6 * (F.cross_entropy(x1, class_id) + F.cross_entropy(x2, class_id)
+                                  + F.cross_entropy(x3, class_id))
 
             optimizer.zero_grad()
             loss_train.backward()
             optimizer.step()
 
-            losses.update(loss_train.data.item(), img1.size()[0])
+            losses.update(loss_train.data.item(), img_now.size()[0])
             writer.add_scalars(args.dataset_name, {"train_loss": losses.val}, epoch * len(train_loader) + idx)
 
             if (idx + 1) % args.disp_interval == 0:
@@ -66,14 +72,14 @@ def train(args):
                 print('time:{}\t'
                       'Epoch: [{:2d}][{:4d}/{:4d}]\t'
                       'LR: {:.5f}\t'
-                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'.format(
-                    dt, epoch + 1, (idx + 1), len(train_loader),
-                    optimizer.param_groups[0]['lr'], loss=losses))
+                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'.
+                      format(dt, epoch + 1, (idx + 1), len(train_loader),
+                             optimizer.param_groups[0]['lr'], loss=losses))
 
         if (epoch + 1) % args.val_Pepoch == 0:
             print("------------------------------val:start-----------------------------")
             with torch.no_grad():
-                test(model, args.Pic_path, True, epoch, args.batch_size, args.input_size, args.dataset_name,writer)
+                test(model, args.Pic_path, True, epoch, args.batch_size, args.input_size, args.dataset_name, writer)
             print("------------------------------ val:end -----------------------------")
 
             if not os.path.exists(os.path.join('./val/model/')):

@@ -17,6 +17,10 @@
       <excludeFolder url="file://$MODULE_DIR$/SA/val" />
       <excludeFolder url="file://$MODULE_DIR$/SA/val_re" />
       <excludeFolder url="file://$MODULE_DIR$/SA/test_result" />
+      <excludeFolder url="file://$MODULE_DIR$/ST/log" />
+      <excludeFolder url="file://$MODULE_DIR$/ST/runs" />
+      <excludeFolder url="file://$MODULE_DIR$/ST/val" />
+      <excludeFolder url="file://$MODULE_DIR$/ST/val_re" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.9 (pytorch_env)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

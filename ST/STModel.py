@@ -76,24 +76,24 @@ class STNetModel(nn.Module):
         incat3 = torch.cat((x1.unsqueeze(1), x3.unsqueeze(1), x2.unsqueeze(1)), 1).view(batch_num, 28, 3, 8, 8)
 
         x11 = self.extra_conv_fusion(torch.cat((F.relu(x1 + self.self_attention(x1)),
-                                                F.relu(x1 + x1 * self.extra_s(self.extra_refineST(incat1).squeeze(2)))),
-                                               1))
+                                                F.relu(x1 + x1 * self.extra_s(
+                                                    self.extra_refineST(incat1).squeeze(2)))), 1))
         x11 = self.extra_ConvGRU(x11, x1)
         self.map_all_1 = x11
         x1sss = F.avg_pool2d(x11, kernel_size=(x11.size(2), x11.size(3)), padding=0)
         x1sss = x1sss.view(-1, 28)  # 1,28
 
         x22 = self.extra_conv_fusion(torch.cat((F.relu(x2 + self.self_attention(x2)),
-                                                F.relu(x2 + x2 * self.extra_s(self.extra_refineST(incat2).squeeze(2)))),
-                                               1))
+                                                F.relu(x2 + x2 * self.extra_s(
+                                                    self.extra_refineST(incat2).squeeze(2)))), 1))
         x22 = self.extra_ConvGRU(x22, x2)
         self.map_all_2 = x22
         x2sss = F.avg_pool2d(x22, kernel_size=(x22.size(2), x22.size(3)), padding=0)
         x2sss = x2sss.view(-1, 28)  # 1,28
 
         x33 = self.extra_conv_fusion(torch.cat((F.relu(x3 + self.self_attention(x3)),
-                                                F.relu(x3 + x3 * self.extra_s(self.extra_refineST(incat3).squeeze(2)))),
-                                               1))
+                                                F.relu(x3 + x3 * self.extra_s(
+                                                    self.extra_refineST(incat3).squeeze(2)))), 1))
         x33 = self.extra_ConvGRU(x33, x3)
         self.map_all_3 = x33
         x3sss = F.avg_pool2d(x33, kernel_size=(x33.size(2), x33.size(3)), padding=0)
