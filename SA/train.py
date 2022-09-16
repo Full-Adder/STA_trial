@@ -12,6 +12,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 def train(args):
     losses = AverageMeter()
+    device = torch.cuda.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, train_mode="train",
                                   STA_mode=args.STA_mode, batch_size=args.batch_size,
@@ -43,17 +44,16 @@ def train(args):
 
         for idx, dat in enumerate(train_loader):  # 从train_loader中获取数据
 
-            img_name1, img1, aud1, inda1, label1 = dat
+            img_name, img1, aud1, class_id, onehot_label = dat
+            img1.to(device)
+            aud1.to(device)
+            class_id.to(device)
 
             if epoch == 0 and idx == 0:
                 writer.add_graph(model, [img1, aud1])
 
-            label1 = label1.cuda(non_blocking=True)
-            img1 = img1.cuda(non_blocking=True)
-            aud1 = aud1.cuda(non_blocking=True)
-
             x11, x22, map1, map2 = model(img1, aud1)
-            loss_train = F.multilabel_soft_margin_loss(x11, label1) + F.multilabel_soft_margin_loss(x22, label1)
+            loss_train = F.cross_entropy(x11, class_id)+F.cross_entropy(x22, class_id)
 
             optimizer.zero_grad()
             loss_train.backward()
