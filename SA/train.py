@@ -45,9 +45,9 @@ def train(args):
         for idx, dat in enumerate(train_loader):  # 从train_loader中获取数据
 
             img_name, img1, aud1, class_id, onehot_label = dat
-            img1.to(device)
-            aud1.to(device)
-            class_id.to(device)
+            img1 = img1.to(device)
+            aud1 = aud1.to(device)
+            class_id = class_id.to(device)
 
             if epoch == 0 and idx == 0:
                 writer.add_graph(model, [img1, aud1])

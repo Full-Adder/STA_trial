@@ -1,7 +1,5 @@
 # STA实验报告
 
-
-
 [1] [作者的代码:guotaowang/STANet (github.com)](https://github.com/guotaowang/STANet)
 
 [2] [修改后本实验代码:Full-Adder/STA_trial (github.com)](https://github.com/Full-Adder/STA_trial)
@@ -54,7 +52,7 @@ AVE 数据集包含4096个时长为10s的MP4视频，每个视频被唯一地标
 
 
 | Category        | VideoID     | Quality | StartTime | EndTime |
-|-----------------|-------------|---------|-----------|---------|
+| --------------- | ----------- | ------- | --------- | ------- |
 | Church bell     | RUhOCu3LNXM | good    | 0         | 10      |
 | Church bell     | MH3m4AwEcRY | good    | 6         | 8       |
 | Acoustic guitar | -AFx6goDrOw | good    | 0         | 10      |
@@ -229,8 +227,6 @@ $\operatorname{MultiLabelSoftMarginLoss}(x, y)=-\frac{1}{C} * \sum_{i} y[i] * \l
 
 相当于对$min-batch$个多个交叉熵损失求平均值。
 
-
-
 ### SA model
 
 ![SA_model](./readme_pic/SA_model.png)
@@ -294,8 +290,6 @@ $\operatorname{MultiLabelSoftMarginLoss}(x, y)=-\frac{1}{C} * \sum_{i} y[i] * \l
 
 $atts = (map1[i] + map2[i]) / 2$  作为CAM结果。
 
-
-
 ##### loss
 
 SA的loss与S模型的loss一样：
@@ -304,8 +298,6 @@ SA的loss与S模型的loss一样：
 loss_train = F.multilabel_soft_margin_loss(x1ss, label1) +
 			F.multilabel_soft_margin_loss(x2ss, label1)
 ```
-
-
 
 ### 模型训练与测试
 

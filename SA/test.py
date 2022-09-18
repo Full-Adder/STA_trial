@@ -29,9 +29,9 @@ def test(model, Pic_path, H5_path, is_val, save_index, batch_size,
     for idx_test, dat_test in enumerate(test_loader):
         with torch.no_grad():
             img_name, img1, aud1, class_id, onehot_label = dat_test
-            img1.to(device)
-            aud1.to(device)
-            class_id.to(device)
+            img1 = img1.to(device)
+            aud1 = aud1.to(device)
+            class_id = class_id.to(device)
 
             x11, x22, map1, map2 = model(img1, aud1)
             loss_t = F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)

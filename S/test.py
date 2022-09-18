@@ -28,8 +28,8 @@ def test(model, Pic_path, is_val, save_index,
         with torch.no_grad():
             img_name, img1, class_id, onehot_label = dat_test
 
-            class_id.to(device)
-            img1.to(device)
+            class_id = class_id.to(device)
+            img1 = img1.to(device)
 
             x11, x22, map1, map2 = model(img1)
             loss_t = F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
