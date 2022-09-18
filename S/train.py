@@ -46,11 +46,11 @@ def train(args):
 
             img_name, img1, class_id, onehot_label = dat
 
-            class_id = class_id.to(device)
-            img1 = img1.to(device)
-
             if epoch == 0 and idx == 0:
                 writer.add_graph(model, img1)
+
+            class_id.to(device)
+            img1 = img1.cuda(non_blocking=True)
 
             x11, x22, map1, map2 = model(img1)
             # loss_train = F.multilabel_soft_margin_loss(x11, onehot_label) + \

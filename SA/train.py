@@ -12,7 +12,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 def train(args):
     losses = AverageMeter()
-    device = torch.cuda.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, train_mode="train",
                                   STA_mode=args.STA_mode, batch_size=args.batch_size,
