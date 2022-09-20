@@ -27,7 +27,7 @@ def train(args):
     audiocls.cuda().eval()
 
     save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')        # 权重保存地点
-    best_pth = os.path.join(save_weight_fold, '%s_%s_model_bast.pth.tar' % (args.dataset_name, args.STA_mode))
+    best_pth = os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
     if os.path.exists(best_pth):
         print("-----> find pretrained model weight in", best_pth)
         state = torch.load(best_pth)

@@ -84,19 +84,20 @@ def train(args):
                  args.input_size, args.dataset_name, writer, val_re_save_path)
             print("------------------------------ val:end -----------------------------")
 
-            if not os.path.exists(save_weight_fold):
-                os.makedirs(save_weight_fold)
-            save_path = os.path.join(save_weight_fold,
-                                     "%s_%s_%03d" % (args.dataset_name, args.STA_mode, epoch + 1) + '.pth')
-            torch.save(model.state_dict(), save_path)  # 保存现在的权重
-            print("weight has been saved in ", save_path)
-            model.train()
+        if not os.path.exists(save_weight_fold):
+            os.makedirs(save_weight_fold)
+        save_path = os.path.join(save_weight_fold,
+                                 "%s_%s_%03d" % (args.dataset_name, args.STA_mode, epoch + 1) + '.pth')
+        torch.save(model.state_dict(), save_path)  # 保存现在的权重
+        print("weight has been saved in ", save_path)
+        model.train()
 
-        save_checkpoint({
-            'epoch': epoch,  # 当前轮数
-            'state_dict': model.state_dict(),  # 模型参数
-            'optimizer': optimizer.state_dict()  # 优化器参数
-        }, filename=os.path.join(save_weight_fold, '%s_%s_model_bast.pth.tar' % (args.dataset_name, args.STA_mode)))
+        if (epoch+1) == args.epoch:
+            save_checkpoint({
+                'epoch': epoch,  # 当前轮数
+                'state_dict': model.state_dict(),  # 模型参数
+                'optimizer': optimizer.state_dict()  # 优化器参数
+            }, filename=os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode)))
 
     writer.close()
 

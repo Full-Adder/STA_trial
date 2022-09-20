@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
     test_epoch = input(r"please input your test weight of your mode! Maybe is 10/20/.../best")
     if test_epoch == "best":
-        best_pth = os.path.join(save_weight_fold, '%s_%s_model_bast.pth.tar' % (args.dataset_name, args.STA_mode))
+        best_pth = os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
         if os.path.exists(best_pth):
             print("-----> find pretrained model weight in", best_pth)
             state = torch.load(best_pth)

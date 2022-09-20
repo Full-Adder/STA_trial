@@ -26,17 +26,17 @@ def get_dataLoader(Pic_path=arg.Pic_path, H5_path=arg.H5_path, train_mode=arg.tr
     if train_mode == "train":
         img_train = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, mode="train", transform=tsfm_train, STA_mode=STA_mode)
         train_loader = DataLoader(img_train, batch_size=batch_size, shuffle=True, drop_last=True)
-        print("dataSet.len:", len(img_train), "\t dataLoader.len:", len(train_loader), 'batch_size:', batch_size)
+        print("TrainSet.len:", len(img_train), "\t dataLoader.len:", len(train_loader), 'batch_size:', batch_size)
         return train_loader
     elif train_mode == "test":
         img_test = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, mode="test", transform=tsfm_test, STA_mode=STA_mode)
-        test_loader = DataLoader(img_test, batch_size=batch_size, shuffle=False, drop_last=True)
-        print("dataSet.len:", len(img_test), "\t dataLoader.len:", len(test_loader), 'batch_size:', batch_size)
+        test_loader = DataLoader(img_test, batch_size=batch_size, shuffle=True, drop_last=True)
+        print("TestSet.len:", len(img_test), "\t dataLoader.len:", len(test_loader), 'batch_size:', batch_size)
         return test_loader
     elif train_mode == "val":
         img_val = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, mode="val", transform=tsfm_test, STA_mode=STA_mode)
         val_loader = DataLoader(img_val, batch_size=batch_size, shuffle=False, drop_last=True)
-        print("dataSet.len:", len(val_loader), "\t dataLoader.len:", len(val_loader), 'batch_size:', batch_size)
+        print("ValSet.len:", len(val_loader), "\t dataLoader.len:", len(val_loader), 'batch_size:', batch_size)
         return val_loader
 
 

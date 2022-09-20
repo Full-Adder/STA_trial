@@ -1,35 +1,36 @@
 import os
 
 txt_name = {"train": "trainSet.txt", "test": "testSet.txt", "val": "valSet.txt", "all": "Annotations.txt"}
+id_category = ['Church bell', 'Male speech, man speaking', 'Bark', 'Fixed-wing aircraft, airplane', 'Race car, auto racing', 'Female speech, woman speaking', 'Helicopter', 'Violin, fiddle', 'Flute', 'Ukulele', 'Frying (food)', 'Truck', 'Shofar', 'Motorcycle', 'Acoustic guitar', 'Train horn', 'Clock', 'Banjo', 'Goat', 'Baby cry, infant cry', 'Bus', 'Chainsaw', 'Cat', 'Horse', 'Toilet flush', 'Rodents, rats, mice', 'Accordion', 'Mandolin']
 category_id = \
-    {'Church bell': 0,
-     'Male speech, man speaking': 1,
-     'Bark': 2,
-     'Fixed-wing aircraft, airplane': 3,
-     'Race car, auto racing': 4,
-     'Female speech, woman speaking': 5,
-     'Helicopter': 6,
-     'Violin, fiddle': 7,
-     'Flute': 8,
-     'Ukulele': 9,
-     'Frying (food)': 10,
-     'Truck': 11,
-     'Shofar': 12,
-     'Motorcycle': 13,
-     'Acoustic guitar': 14,
-     'Train horn': 15,
-     'Clock': 16,
-     'Banjo': 17,
-     'Goat': 18,
-     'Baby cry, infant cry': 19,
-     'Bus': 20,
-     'Chainsaw': 21,
-     'Cat': 22,
-     'Horse': 23,
-     'Toilet flush': 24,
-     'Rodents, rats, mice': 25,
-     'Accordion': 26,
-     'Mandolin': 27}
+    {'Church bell': 0,                      # 教堂的钟
+     'Male speech, man speaking': 1,        # 男人说话
+     'Bark': 2,                             # 犬吠
+     'Fixed-wing aircraft, airplane': 3,    # 固定翼飞机
+     'Race car, auto racing': 4,            # 赛车
+     'Female speech, woman speaking': 5,    # 女人说话
+     'Helicopter': 6,               # 直升机
+     'Violin, fiddle': 7,           # 小提琴
+     'Flute': 8,                    # 长笛
+     'Ukulele': 9,                  # 尤克里里
+     'Frying (food)': 10,           # 油炸(食物)
+     'Truck': 11,                   # 卡车
+     'Shofar': 12,                  # 羊角号
+     'Motorcycle': 13,              # 摩托车
+     'Acoustic guitar': 14,         # 原声吉他
+     'Train horn': 15,              # 火车鸣叫
+     'Clock': 16,                   # 闹钟
+     'Banjo': 17,                   # 班卓琴
+     'Goat': 18,                    # 山羊
+     'Baby cry, infant cry': 19,    # 婴儿啼哭
+     'Bus': 20,                     # 公交车
+     'Chainsaw': 21,                # 电锯
+     'Cat': 22,                     # 猫
+     'Horse': 23,                   # 马
+     'Toilet flush': 24,            # 马桶冲水
+     'Rodents, rats, mice': 25,     # 啮齿动物、大鼠、小鼠
+     'Accordion': 26,   # 手风琴
+     'Mandolin': 27}    # 洋琵琶
 
 
 def readDataTxt(DataSet_path, mode):
@@ -57,14 +58,18 @@ def get_category_to_key():
 
 
 if __name__ == "__main__":
-    mydata = readDataTxt("../AVE_Dataset", "train")
-
-    print(get_txtList())
-    print(get_category_to_key())
-
-    for i in range(8):
-        print(mydata[i])
-
+    # mydata = readDataTxt("../AVE_Dataset", "train")
+    #
+    # print(get_txtList())
+    # print(get_category_to_key())
+    #
+    # for i in range(8):
+    #     print(mydata[i])
+    a = list(range(0,30))
+    for name, id in category_id.items():
+        print(name,id)
+        a[id] = name
+    print(a)
 """
 ['c---zaDCTaE', 0, 0, 10]
 ['fCZi6I6kPpU', 0, 6, 10]
