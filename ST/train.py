@@ -14,12 +14,13 @@ def train(args):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     losses = AverageMeter()
 
-    train_loader = get_dataLoader(Pic_path=args.Pic_path, train_mode="train", STA_mode=args.STA_mode,
-                                  batch_size=args.batch_size, input_size=args.input_size,
-                                  crop_size=args.crop_size)
+    train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, train_mode="train",
+                                  STA_mode=args.STA_mode, batch_size=args.batch_size,
+                                  input_size=args.input_size, crop_size=args.crop_size)
     model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
 
-    best_pth = "./runs/model_best.pth.tar"
+    save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')  # 权重保存地点
+    best_pth = os.path.join(save_weight_fold, '%s_%s_model_bast.pth.tar' % (args.dataset_name, args.STA_mode))
     if os.path.exists(best_pth):
         print("-----> find pretrained model weight in", best_pth)
         state = torch.load(best_pth)
@@ -35,7 +36,8 @@ def train(args):
     else:
         total_epoch = 0
 
-    writer = SummaryWriter(args.SummaryWriter_dir)
+    writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, './log/'))  # tensorboard保存地点
+    val_re_save_path = os.path.join(args.save_dir, args.STA_mode, './val_re/')  # 验证集结果保存地点
 
     for epoch in range(total_epoch, args.epoch):
         model.train()
@@ -78,8 +80,8 @@ def train(args):
 
         if (epoch + 1) % args.val_Pepoch == 0:
             print("------------------------------val:start-----------------------------")
-            with torch.no_grad():
-                test(model, args.Pic_path, True, epoch, args.batch_size, args.input_size, args.dataset_name, writer)
+            test(model, args.Pic_path,   args.H5_path, True, epoch, args.batch_size,
+                 args.input_size, args.dataset_name, writer, val_re_save_path)
             print("------------------------------ val:end -----------------------------")
 
             if not os.path.exists(os.path.join('./val/model/')):
@@ -90,14 +92,11 @@ def train(args):
 
             model.train()
 
-        if (epoch + 1) == args.epoch:
-            save_checkpoint({
-                'epoch': epoch,  # 当前轮数
-                'state_dict': model.state_dict(),  # 模型参数
-                'optimizer': optimizer.state_dict()  # 优化器参数
-            },
-                is_best=True, checkpoint_dir=args.Checkpoint_dir,
-                filename='%s_epoch_%d.pth' % (args.dataset_name, epoch + 1))
+        save_checkpoint({
+            'epoch': epoch,  # 当前轮数
+            'state_dict': model.state_dict(),  # 模型参数
+            'optimizer': optimizer.state_dict()  # 优化器参数
+        }, filename=os.path.join(save_weight_fold, '%s_%s_model_bast.pth.tar' % (args.dataset_name, args.STA_mode)))
 
     writer.close()
 

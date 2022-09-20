@@ -10,24 +10,23 @@ from datetime import datetime
 from utils.model_tool import get_model
 
 
-def test(model, Pic_path, is_val, save_index,
-         batch_size, input_size, dataset_name, Summary_Writer, test_re_dir=None):
+def test(model, Pic_path, is_val, save_index, batch_size,
+         input_size, dataset_name, Summary_Writer, test_re_dir=None):
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = model.eval()
 
     if is_val:
-        save_path_hh = './val_re/' + str(save_index)
+        save_path_hh = os.path.join(test_re_dir, str(save_index))
     else:
         save_path_hh = test_re_dir
-
-    test_loader = get_dataLoader(Pic_path=Pic_path, train_mode="test", STA_mode="S",
+    val_mode = "val" if is_val else "test"
+    test_loader = get_dataLoader(Pic_path=Pic_path, train_mode=val_mode, STA_mode="S",
                                  batch_size=batch_size, input_size=input_size)  # 获取测试集
-
+    # !!
     for idx_test, dat_test in enumerate(test_loader):
         with torch.no_grad():
             img_name, img1, class_id, onehot_label = dat_test
-
             class_id = class_id.to(device)
             img1 = img1.to(device)
 
@@ -39,6 +38,9 @@ def test(model, Pic_path, is_val, save_index,
         if is_val:
             Summary_Writer.add_scalars(dataset_name, {"val_loss": loss_t.data.item()},
                                        (save_index * len(test_loader) + idx_test) * 8)
+        else:
+            Summary_Writer.add_scalar(dataset_name + "_" + args.STA_mode + "_test_loss", loss_t.data.item(),
+                                      save_index * len(test_loader) + idx_test)
 
         dt = datetime.now().strftime("%y-%m-%d %H:%M:%S")
         if idx_test % 10 == 0:
@@ -87,29 +89,51 @@ def test(model, Pic_path, is_val, save_index,
 
 
 if __name__ == '__main__':
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     args = get_parser()
-    net, _ = get_model("S")
-    best_pth = "./runs/model_best.pth.tar"
-    if os.path.exists(best_pth):
-        state = torch.load(best_pth)
-        net.load_state_dict(state['state_dict'])
-        print("load pretrained weight form ", best_pth)
+    net, _ = get_model(args.STA_mode)
+    save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')
 
-    if not os.path.exists(r'./test_result'):
-        os.makedirs(r'./test_result')
-    net.to("cuda")
+    test_epoch = input(r"please input your test weight of your mode! Maybe is 10/20/.../best")
+    if test_epoch == "best":
+        best_pth = os.path.join(save_weight_fold, '%s_%s_model_bast.pth.tar' % (args.dataset_name, args.STA_mode))
+        if os.path.exists(best_pth):
+            print("-----> find pretrained model weight in", best_pth)
+            state = torch.load(best_pth)
+            net.load_state_dict(state['state_dict'])
+        else:
+            print("Error! There is not pretrained weight --" + test_epoch, "in", best_pth)
+            exit()
 
-    # test()
+    else:
+        num = int(test_epoch)
+        best_pth = os.path.join(save_weight_fold, "%s_%s_%03d" % (args.dataset_name, args.STA_mode, num) + '.pth')
+        if os.path.exists(best_pth):
+            print("-----> find pretrained model weight in", best_pth)
+            state = torch.load(best_pth)
+            net.load_state_dict(state)
+        else:
+            print("Error! There is not pretrained weight --" + test_epoch, "in", best_pth)
+            exit()
+
+    print("-----> success load pretrained weight form ", best_pth)
+    print("-----> let's test! -------------->")
+    net.to(device)
+
+    # ============================val()======================================
     # writer = SummaryWriter(r'./test_result/log')
     # test(model=net, Pic_path=args.Pic_path, is_val=False, save_index=0, batch_size=args.batch_size,
     #      input_size=args.input_size, dataset_name=args.dataset_name, Summary_Writer=writer,
     #      test_re_dir=r'./test_result')
 
-    # val()
-    writer = SummaryWriter(r'./log')
-    for i in range(5):
-        test(model=net, Pic_path=args.Pic_path, is_val=True, save_index=i, batch_size=args.batch_size,
-             input_size=args.input_size, dataset_name=args.dataset_name, Summary_Writer=writer)
+    # =============================test()====================================
+    test_result_dir = os.path.join("/media/ubuntu/Data", r'./%s_test_result/' % args.STA_mode)  # 结果保存文件夹
+    if not os.path.exists(test_result_dir):
+        os.makedirs(test_result_dir)
+    writer = SummaryWriter(os.path.join(test_result_dir, r'./log/'))
+    test(model=net, Pic_path=args.Pic_path, is_val=False,
+         save_index=0, batch_size=args.batch_size, input_size=args.input_size,
+         dataset_name=args.dataset_name, Summary_Writer=writer, test_re_dir=test_result_dir)
     writer.close()
 
 #  tensorboard.exe --logdir ./ --samples_per_plugin images=100

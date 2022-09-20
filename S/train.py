@@ -11,22 +11,22 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 def train(args):
-
     losses = AverageMeter()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    train_loader = get_dataLoader(Pic_path=args.Pic_path, train_mode="train", STA_mode=args.STA_mode,
-                                  batch_size=args.batch_size, input_size=args.input_size,
-                                  crop_size=args.crop_size)
+    train_loader = get_dataLoader(Pic_path=args.Pic_path, train_mode="train",
+                                  STA_mode=args.STA_mode, batch_size=args.batch_size,
+                                  input_size=args.input_size, crop_size=args.crop_size)
     model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
 
-    best_pth = "./runs/model_best.pth.tar"
+    save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')  # 权重保存地点
+    best_pth = os.path.join(save_weight_fold, '%s_%s_model_bast.pth.tar' % (args.dataset_name, args.STA_mode))
     if os.path.exists(best_pth):
-        print("-----> find pretrained model weight in",best_pth)
+        print("-----> find pretrained model weight in", best_pth)
         state = torch.load(best_pth)
         total_epoch = state['epoch'] + 1
+        print("-----> has trained", total_epoch + 1, 'in', best_pth)
         if total_epoch >= args.epoch:
-            print("-----> has trained", total_epoch+1, 'in', best_pth)
             print("-----> your arg.epoch:", args.epoch)
             return
         model.load_state_dict(state['state_dict'])
@@ -36,26 +36,24 @@ def train(args):
     else:
         total_epoch = 0
 
-    writer = SummaryWriter(args.SummaryWriter_dir)
+    writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, './log/'))  # tensorboard保存地点
+    val_re_save_path = os.path.join(args.save_dir, args.STA_mode, './val_re/')
 
-    for epoch in range(total_epoch,args.epoch):
+    for epoch in range(total_epoch, args.epoch):
         model.train()
         losses.reset()
 
         for idx, dat in enumerate(train_loader):  # 从train_loader中获取数据
 
             img_name, img1, class_id, onehot_label = dat
+            class_id.to(device)
+            img1 = img1.to(device)
 
             if epoch == 0 and idx == 0:
                 writer.add_graph(model, img1)
 
-            class_id.to(device)
-            img1 = img1.cuda(non_blocking=True)
-
             x11, x22, map1, map2 = model(img1)
-            # loss_train = F.multilabel_soft_margin_loss(x11, onehot_label) + \
-            #              F.multilabel_soft_margin_loss(x22, onehot_label)
-            loss_train = F.cross_entropy(x11, class_id)+F.cross_entropy(x22, class_id)
+            loss_train = F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
 
             optimizer.zero_grad()
             loss_train.backward()
@@ -75,13 +73,14 @@ def train(args):
 
         if (epoch + 1) % args.val_Pepoch == 0:
             print("------------------------------val:start-----------------------------")
-            with torch.no_grad():
-                test(model, args.Pic_path, True, epoch, args.batch_size, args.input_size, args.dataset_name,writer)
+            test(model, args.Pic_path, True, epoch, args.batch_size,
+                 args.input_size, args.dataset_name, writer, val_re_save_path)
             print("------------------------------ val:end -----------------------------")
 
-            if not os.path.exists(os.path.join('./val/model/')):
-                os.makedirs(os.path.join('./val/model/'))
-            save_path = os.path.join('./val/model/', "%s_%03d" % (args.dataset_name, epoch + 1) + '.pth')
+            if not os.path.exists(save_weight_fold):
+                os.makedirs(save_weight_fold)
+            save_path = os.path.join(save_weight_fold,
+                                     "%s_%s_%03d" % (args.dataset_name, args.STA_mode, epoch + 1) + '.pth')
             torch.save(model.state_dict(), save_path)  # 保存现在的权重
             print("weight has been saved in ", save_path)
 
@@ -92,9 +91,7 @@ def train(args):
                 'epoch': epoch,  # 当前轮数
                 'state_dict': model.state_dict(),  # 模型参数
                 'optimizer': optimizer.state_dict()  # 优化器参数
-            },
-                is_best=True, checkpoint_dir=args.Checkpoint_dir,
-                filename='%s_epoch_%d.pth' % (args.dataset_name, epoch + 1))
+            }, filename=os.path.join(save_weight_fold, '%s_%s_model_bast.pth.tar' % (args.dataset_name, args.STA_mode)))
 
     writer.close()
 
@@ -102,6 +99,4 @@ def train(args):
 if __name__ == '__main__':
 
     args = get_parser()  # 获得命令行参数
-    if not os.path.exists(args.SummaryWriter_dir):
-        os.makedirs(args.SummaryWriter_dir)
     train(args)

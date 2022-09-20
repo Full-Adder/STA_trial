@@ -5,18 +5,20 @@ import torch.optim as optim
 from S.Smodel import SNetModel
 from SA.SAmodel import SANetModel
 from ST.STModel import STNetModel
+from STA.STAmodel import STANet
 from torch.utils.tensorboard import SummaryWriter
 
 
 def get_model(STA_mode, lr=0.00005, weight_decay=0.0005):  # 获取 model
     assert STA_mode in ["S", "ST", "SA", "STA"], "STA_mode must be S/ST/SA/STA"
-    model = None
     if STA_mode == "S":
         model = SNetModel()  # 获得S
     elif STA_mode == "SA":
         model = SANetModel()
     elif STA_mode == "ST":
         model = STNetModel()
+    else:   # STA
+        model = STANet()
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)  # 加载到GPU:0
@@ -29,13 +31,10 @@ def get_model(STA_mode, lr=0.00005, weight_decay=0.0005):  # 获取 model
     return model, optimizer  # 返回模型和优化器
 
 
-def save_checkpoint(state, is_best, checkpoint_dir, filename='checkpoint.pth.tar'):
-    if not os.path.exists(checkpoint_dir):
-        os.makedirs(checkpoint_dir)
-    save_path = os.path.join(checkpoint_dir, filename)
-    torch.save(state, save_path)
-    if is_best:  # 如果是最好的
-        shutil.copyfile(save_path, os.path.join(checkpoint_dir, 'model_best.pth.tar'))  # 文件命名best复制到快照文件夹
+def save_checkpoint(state, filename):
+    if not os.path.exists(filename):
+        os.makedirs(filename)
+    torch.save(state, filename)
     print("Congratulations! Your train code has been processed!")
-    print("And your --epoch  --modul_weight  -- optim_weigh has been saved in ", save_path)
+    print("And your --epoch  --modul_weight  -- optim_weigh has been saved in ", filename)
 

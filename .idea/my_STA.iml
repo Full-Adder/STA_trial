@@ -22,7 +22,7 @@
       <excludeFolder url="file://$MODULE_DIR$/ST/val" />
       <excludeFolder url="file://$MODULE_DIR$/ST/val_re" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.8 (pytorch_env)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (pytorch_env)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

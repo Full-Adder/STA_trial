@@ -20,7 +20,8 @@ def train(args):
 
     model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
 
-    best_pth = "./runs/model_best.pth.tar"
+    save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')  # 权重保存地点
+    best_pth = os.path.join(save_weight_fold, '%s_%s_model_bast.pth.tar' % (args.dataset_name, args.STA_mode))
     if os.path.exists(best_pth):
         print("-----> find pretrained model weight in", best_pth)
         state = torch.load(best_pth)
@@ -36,7 +37,8 @@ def train(args):
     else:
         total_epoch = 0
 
-    writer = SummaryWriter(args.SummaryWriter_dir)
+    writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, './log/'))  # tensorboard保存地点
+    val_re_save_path = os.path.join(args.save_dir, args.STA_mode, './val_re/')      # 验证集结果保存地点
 
     for epoch in range(total_epoch, args.epoch):
         model.train()
@@ -53,7 +55,7 @@ def train(args):
                 writer.add_graph(model, [img1, aud1])
 
             x11, x22, map1, map2 = model(img1, aud1)
-            loss_train = F.cross_entropy(x11, class_id)+F.cross_entropy(x22, class_id)
+            loss_train = F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
 
             optimizer.zero_grad()
             loss_train.backward()
@@ -67,20 +69,20 @@ def train(args):
                 print('time:{}\t'
                       'Epoch: [{:2d}][{:4d}/{:4d}]\t'
                       'LR: {:.5f}\t'
-                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'.format(
-                    dt, epoch + 1, (idx + 1), len(train_loader),
-                    optimizer.param_groups[0]['lr'], loss=losses))
+                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'.
+                      format(dt, epoch + 1, (idx + 1), len(train_loader),
+                             optimizer.param_groups[0]['lr'], loss=losses))
 
         if (epoch + 1) % args.val_Pepoch == 0:
             print("------------------------------val:start-----------------------------")
-            with torch.no_grad():
-                test(model, args.Pic_path, args.H5_path, True, epoch,
-                     args.batch_size, args.input_size, args.dataset_name, writer)
+            test(model, args.Pic_path, args.H5_path, True, epoch, args.batch_size,
+                 args.input_size, args.dataset_name, writer, val_re_save_path)
             print("------------------------------ val:end -----------------------------")
 
-            if not os.path.exists(os.path.join('./val/model/')):
-                os.makedirs(os.path.join('./val/model/'))
-            save_path = os.path.join('./val/model/', "%s_%03d" % (args.dataset_name, epoch + 1) + '.pth')
+            if not os.path.exists(save_weight_fold):
+                os.makedirs(save_weight_fold)
+            save_path = os.path.join(save_weight_fold,
+                                     "%s_%s_%03d" % (args.dataset_name, args.STA_mode, epoch + 1) + '.pth')
             torch.save(model.state_dict(), save_path)  # 保存现在的权重
             print("weight has been saved in ", save_path)
 
@@ -91,9 +93,7 @@ def train(args):
                 'epoch': epoch,  # 当前轮数
                 'state_dict': model.state_dict(),  # 模型参数
                 'optimizer': optimizer.state_dict()  # 优化器参数
-            },
-                is_best=True, checkpoint_dir=args.Checkpoint_dir,
-                filename='%s_epoch_%d.pth' % (args.dataset_name, epoch + 1))
+            }, filename=os.path.join(save_weight_fold, '%s_%s_model_bast.pth.tar' % (args.dataset_name, args.STA_mode)))
 
     writer.close()
 
@@ -101,6 +101,4 @@ def train(args):
 if __name__ == '__main__':
 
     args = get_parser()  # 获得命令行参数
-    if not os.path.exists(args.SummaryWriter_dir):
-        os.makedirs(args.SummaryWriter_dir)
     train(args)
