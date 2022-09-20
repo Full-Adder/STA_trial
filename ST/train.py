@@ -84,12 +84,12 @@ def train(args):
                  args.input_size, args.dataset_name, writer, val_re_save_path)
             print("------------------------------ val:end -----------------------------")
 
-            if not os.path.exists(os.path.join('./val/model/')):
-                os.makedirs(os.path.join('./val/model/'))
-            save_path = os.path.join('./val/model/', "%s_%03d" % (args.dataset_name, epoch + 1) + '.pth')
+            if not os.path.exists(save_weight_fold):
+                os.makedirs(save_weight_fold)
+            save_path = os.path.join(save_weight_fold,
+                                     "%s_%s_%03d" % (args.dataset_name, args.STA_mode, epoch + 1) + '.pth')
             torch.save(model.state_dict(), save_path)  # 保存现在的权重
             print("weight has been saved in ", save_path)
-
             model.train()
 
         save_checkpoint({
@@ -104,6 +104,4 @@ def train(args):
 if __name__ == '__main__':
 
     args = get_parser()  # 获得命令行参数
-    if not os.path.exists(args.SummaryWriter_dir):
-        os.makedirs(args.SummaryWriter_dir)
     train(args)

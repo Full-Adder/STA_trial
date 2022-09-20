@@ -2,13 +2,12 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import transforms
 from utils.DataSet import AVEDataset
 from utils.args_config import get_parser
-from args_config import get_parser
 
 arg = get_parser()
 
 
-def get_dataLoader(Pic_path=arg.Pic_path, H5_path=arg.H5_path, train_mode=arg.train_mod,
-                   STA_mode=arg.STA_mod, batch_size=arg.batch_size, input_size=arg.input_size, crop_size=arg.crop_size):
+def get_dataLoader(Pic_path=arg.Pic_path, H5_path=arg.H5_path, train_mode=arg.train_mode,
+                   STA_mode=arg.STA_mode, batch_size=arg.batch_size, input_size=arg.input_size, crop_size=arg.crop_size):
     mean_vals = [0.485, 0.456, 0.406]  # 数据均值
     std_vals = [0.229, 0.224, 0.225]  # 数据标准差
 
