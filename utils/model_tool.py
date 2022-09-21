@@ -1,11 +1,12 @@
 import os
 import torch
-import shutil  # 文件操作
+import torch.onnx
 import torch.optim as optim
 from S.Smodel import SNetModel
 from SA.SAmodel import SANetModel
 from ST.STModel import STNetModel
 from STA.STAmodel import STANet
+from utils.DataLoader import get_dataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 
@@ -38,3 +39,17 @@ def save_checkpoint(state, filename):
     print("Congratulations! Your train code has been processed!")
     print("And your --epoch  --modul_weight  -- optim_weigh has been saved in ", filename)
 
+
+def save_model_to_oxxn(STA_mode):
+    model, _ = get_model(STA_mode)
+    state = torch.load("../Result/S/model_weight/AVE_S_030.pth")
+    model.load_state_dict(state)
+    model.to('cpu')
+    dataload = get_dataLoader(STA_mode=STA_mode, batch_size=1, train_mode="val")
+    _, x, _, _ = next(iter(dataload))
+    print(x,x.shape)
+    torch.onnx.export(model, x, "../S_model.onnx", export_params=True, verbose=True)
+
+
+if __name__ == '__main__':
+    save_model_to_oxxn("S")
