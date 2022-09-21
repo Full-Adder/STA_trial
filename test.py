@@ -10,6 +10,8 @@ from datetime import datetime
 from utils.model_tool import get_model
 from utils.DataFromtxt import id_category
 
+args = get_parser()
+
 
 def test(model, Pic_path, H5_path, is_val, save_index, batch_size,
          input_size, dataset_name, Summary_Writer, test_re_dir):
