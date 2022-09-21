@@ -641,12 +641,12 @@ def load_model_weight_bef_test(test_weight_id=-1):
 
 以下是test_result (epoch=30)的展示:
 
-|    label    |            right            |                            wrong                             |         wrong_result          |
-| :---------: | :-------------------------: | :----------------------------------------------------------: | :---------------------------: |
-| Church bell | ![01](Readme.assets/01.jpg) |  ![01(wrong_02_Bark)](Readme.assets/01(wrong_02_Bark).jpg)   |             Bark              |
-|     bus     | ![03](Readme.assets/03.jpg) | ![01(wrong_04_Race car, auto racing)](Readme.assets/01(wrong_04_Race car, auto racing).jpg) |     Race car, auto racing     |
-|    Flute    | ![06](Readme.assets/06.jpg) | ![07(wrong_01_Male speech, man speaking)](Readme.assets/07(wrong_01_Male speech, man speaking).jpg) |   Male speech, man speaking   |
-|    horse    | ![02](Readme.assets/02.jpg) | ![03(wrong_03_Fixed-wing aircraft, airplane)](Readme.assets/03(wrong_03_Fixed-wing aircraft, airplane).jpg) | Fixed-wing aircraft, airplane |
+|    label    |            right            |                               wrong                               |         wrong_result          |
+|:-----------:|:---------------------------:|:-----------------------------------------------------------------:|:-----------------------------:|
+| Church bell | ![01](Readme.assets/01.jpg) |     ![01(wrong_02_Bark)](Readme.assets/01(wrong_02_Bark).jpg)     |             Bark              |
+|     bus     | ![03](Readme.assets/03.jpg) |     ![01](Readme.assets/01(wrong_04_Racecar,autoracing).jpg)      |     Race car, auto racing     |
+|    Flute    | ![06](Readme.assets/06.jpg) |   ![07](Readme.assets/07(wrong_01_Malespeech,manspeaking).jpg)    |   Male speech, man speaking   |
+|    horse    | ![02](Readme.assets/02.jpg) | ![03](Readme.assets/03(wrong_03_Fixed-wingaircraft,airplane).jpg) | Fixed-wing aircraft, airplane |
 
 第30轮的验证损失反而增高了，从个人理解应该是由于视频种类有许多相近的地方，例如有多种乐器分类的画面都是音乐家在演奏，仅从低分辨率的图像很难将各种乐器准确的分辨出来，并且演奏的画面又与说话的视频种类类似，这很大程度的导致了较大的损失。随着训练的进行，特征的区域更加精确，范围缩小，各分类的概率相差更大，使分类结果错误更多。
 
