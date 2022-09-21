@@ -28,7 +28,7 @@
 
 项目目录如下：
 
-<img src="./readme_pic/image-20220831140650841.png" alt="image-20220831140650841" style="zoom: 50%;" />
+<img src="Readme.assets/image-20220921234526308.png" alt="image-20220921234526308" style="zoom:50%;" />
 
 ## AVE数据集介绍
 
@@ -48,7 +48,7 @@ AVE数据集结构如下：
         --bSurT-1Ak.mp4
 ```
 
-AVE 数据集包含4096个时长为10s的MP4视频，每个视频被唯一地标注了一个视频种类标签，数据集共被标注了28个视频分类标签。视频的类别等信息存储在$Annotations.txt$, $test.txt$, $train.txt$ 中，存储数据如下：
+AVE 数据集包含4096个时长为10s的MP4视频，每个视频被唯一地标注了一个视频种类标签，数据集共被标注了28个视频分类标签。视频的类别等信息存储在 $Annotations.txt$, $test.txt$, $train.txt$ 中，存储数据如下：
 
 
 | Category        | VideoID     | Quality | StartTime | EndTime |
@@ -150,7 +150,6 @@ class AVEDataset(Dataset):  # 数据集类
             else:  # "STA"
                 pass
 
-
 ```
 
 #### 数据加载器
@@ -192,7 +191,7 @@ def get_dataLoader(Pic_path=r"../AVE_Dataset/Video", H5_path=r"../AVE_Dataset/H5
 
 ### S model
 
-![image-20220831151542976](./readme_pic/S_model.png)
+![image-20220831151542976](Readme.assets/S_model.png)
 
 
 | x_name      | later_name                   | detail                                    | output_size         |
@@ -248,7 +247,7 @@ loss_train = F.cross_entropy(x11, class_id)+F.cross_entropy(x22, class_id)
 
 ### SA model
 
-![SA_model](./readme_pic/SA_model.png)
+![SA_model](Readme.assets/SA_model.png)
 
 
 | x_name      | later_name                                                                            | detail                                            | output_size      |
@@ -322,75 +321,358 @@ loss_train = F.cross_entropy(x11, class_id)+F.cross_entropy(x22, class_id)
 #### train.py
 
 ```python
-for epoch in range(total_epoch,args.epoch):
-    model.train()
-    losses.reset()
+def train(args):
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    losses = AverageMeter()
 
-    for idx, dat in enumerate(train_loader):  # 从train_loader中获取数据
+    train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, train_mode="train",
+                                  STA_mode=args.STA_mode, batch_size=args.batch_size,
+                                  input_size=args.input_size, crop_size=args.crop_size)
+    model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
 
-        img_name1, img1, inda1, label1 = dat	# 获取数据
+    save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')  # 权重保存地点
+    best_pth = os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
+    if os.path.exists(best_pth):
+        print("-----> find pretrained model weight in", best_pth)
+        state = torch.load(best_pth)
+        total_epoch = state['epoch'] + 1
+        print("-----> has trained", total_epoch + 1, 'in', best_pth)
+        if total_epoch >= args.epoch:
+            print("-----> your arg.epoch:", args.epoch)
+            return
+        model.load_state_dict(state['state_dict'])
+        optimizer.load_state_dict(state['optimizer'])
+        print("-----> success load pretrained weight form ", best_pth)
+        print("-----> continue to train!")
+    else:
+        total_epoch = 0
 
+    writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, './train_log/'))  # tensorboard保存地点
+    val_re_save_path = os.path.join(args.save_dir, args.STA_mode, './val_re/')
 
-        label1 = label1.cuda(non_blocking=True)
-        img1 = img1.cuda(non_blocking=True)
+    for epoch in range(total_epoch, args.epoch):
+        model.train()
+        losses.reset()
 
-        x11, x22, map1, map2 = model(img1)	# 向前传播
-        loss_train = F.multilabel_soft_margin_loss(x11, label1) + 
-        			F.multilabel_soft_margin_loss(x22, label1)
+        for idx, dat in enumerate(train_loader):  # 从train_loader中获取数据
 
-        optimizer.zero_grad()
-        loss_train.backward()	# 向后传播梯度
-        optimizer.step()		# 优化网络权重
+            if args.STA_mode == "S":
+                img_name, img1, class_id, onehot_label = dat
+                class_id.to(device)
+                img1 = img1.to(device)
 
-        losses.update(loss_train.data.item(), img1.size()[0])
+                if epoch == 0 and idx == 0:
+                    writer.add_graph(model, img1)
 
-        if (idx + 1) % args.disp_interval == 0:	# 打印loss
-            dt = datetime.now().strftime("%y-%m-%d %H:%M:%S")
-            print('time:{}\t'
-                  'Epoch: [{:2d}][{:4d}/{:4d}]\t'
-                  'LR: {:.5f}\t'
-                  'Loss {loss.val:.4f} ({loss.avg:.4f})\t'.format(
-                dt, epoch + 1, (idx + 1), len(train_loader),
-                optimizer.param_groups[0]['lr'], loss=losses))
+                x11, x22, map1, map2 = model(img1)
+                loss_train = F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
 
-    if (epoch + 1) % args.val_Pepoch == 0:	# 验证
-        print("------------------------------val:start-----------------------------")
-        with torch.no_grad():
-            test(model, args.Pic_path, True, epoch, args.batch_size,
-                 args.input_size, args.dataset_name,writer)
-        print("------------------------------ val:end -----------------------------")
+            elif args.STA_mode == "SA":
+                img_name, img1, aud1, class_id, onehot_label = dat
+                img1 = img1.to(device)
+                aud1 = aud1.to(device)
+                class_id = class_id.to(device)
+
+                if epoch == 0 and idx == 0:
+                    writer.add_graph(model, [img1, aud1])
+
+                x11, x22, map1, map2 = model(img1, aud1)
+                loss_train = F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
+
+            elif args.STA_mode == "ST":
+                img_name, img_bef, img1, img_aft, class_id, onehot_label = dat
+
+                img_bef = img_bef.to(device)
+                img1 = img1.to(device)
+                img_aft = img_aft.to(device)
+                class_id = class_id.to(device)
+
+                if epoch == 0 and idx == 0:
+                    writer.add_graph(model, [img_bef, img1, img_aft])
+
+                x11, x1, x22, x2, x33, x3, map1, map2 = model(img_bef, img1, img_aft)
+                loss_train = 0.4 * (F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
+                                    + F.cross_entropy(x33, class_id)) \
+                             + 0.6 * (F.cross_entropy(x1, class_id) + F.cross_entropy(x2, class_id)
+                                      + F.cross_entropy(x3, class_id))
+            else:
+                pass
+
+            optimizer.zero_grad()
+            loss_train.backward()
+            optimizer.step()
+
+            losses.update(loss_train.data.item(), img1.size()[0])
+            writer.add_scalars(args.dataset_name, {"train_loss": losses.val}, epoch * len(train_loader) + idx)
+
+            if (idx + 1) % args.disp_interval == 0:
+                dt = datetime.now().strftime("%y-%m-%d %H:%M:%S")
+                print('time:{}\t'
+                      'Epoch: [{:2d}][{:4d}/{:4d}]\t'
+                      'LR: {:.5f}\t'
+                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'.
+                      format(dt, epoch + 1, (idx + 1), len(train_loader),
+                             optimizer.param_groups[0]['lr'], loss=losses))
+
+        if (epoch + 1) % args.val_Pepoch == 0:
+            print("------------------------------val:start-----------------------------")
+            test(model, args.Pic_path, args.H5_path, True, epoch, args.batch_size,
+                 args.input_size, args.dataset_name, writer, val_re_save_path)
+            print("------------------------------ val:end -----------------------------")
+
+        if not os.path.exists(save_weight_fold):
+            os.makedirs(save_weight_fold)
+        save_path = os.path.join(save_weight_fold,
+                                 "%s_%s_%03d" % (args.dataset_name, args.STA_mode, epoch + 1) + '.pth')
+        torch.save(model.state_dict(), save_path)  # 保存现在的权重
+        print("weight has been saved in ", save_path)
+
+        model.train()
+
+        if (epoch + 1) == args.epoch:
+            save_checkpoint({
+                'epoch': epoch,  # 当前轮数
+                'state_dict': model.state_dict(),  # 模型参数
+                'optimizer': optimizer.state_dict()  # 优化器参数
+            }, filename=os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode)))
+
+    writer.close()
+
 ```
+
+#### test.py
+
+```python
+def test(model, Pic_path, H5_path, is_val, save_index, batch_size,
+         input_size, dataset_name, Summary_Writer, test_re_dir):
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    model = model.eval()
+
+    if is_val:
+        save_path_hh = os.path.join(test_re_dir, str(save_index))
+    else:
+        save_path_hh = test_re_dir
+
+    val_mode = "val" if is_val else "test"
+    test_loader = get_dataLoader(Pic_path=Pic_path, H5_path=H5_path, train_mode=val_mode, STA_mode=args.STA_mode,
+                                 batch_size=batch_size, input_size=input_size)  # 获取测试集
+    # !!
+    for idx_test, dat_test in enumerate(test_loader):
+        with torch.no_grad():
+            if args.STA_mode == "S":
+                img_name, img1, class_id, onehot_label = dat_test
+                img1 = img1.to(device)
+                class_id = class_id.to(device)
+
+                x11, x22, map1, map2 = model(img1)
+                loss_t = F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
+
+            elif args.STA_mode == "SA":
+                img_name, img1, aud1, class_id, onehot_label = dat_test
+                img1 = img1.to(device)
+                aud1 = aud1.to(device)
+                class_id = class_id.to(device)
+
+                x11, x22, map1, map2 = model(img1, aud1)
+                loss_t = F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
+
+            elif args.STA_mode == "ST":
+                img_name, img_bef, img_now, img_aft, class_id, onehot_label = dat_test
+
+                img_bef = img_bef.to(device)
+                img_now = img_now.to(device)
+                img_aft = img_aft.to(device)
+                class_id = class_id.to(device)
+
+                x11, x1, x22, x2, x33, x3, map1, map2 = model(img_bef, img_now, img_aft)
+
+                loss_t = 0.4 * (F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
+                                + F.cross_entropy(x33, class_id)) \
+                         + 0.6 * (F.cross_entropy(x1, class_id) + F.cross_entropy(x2, class_id)
+                                  + F.cross_entropy(x3, class_id))
+            else:
+                pass
+
+        result_show_list = []
+        if is_val:
+            Summary_Writer.add_scalars(dataset_name, {"val_loss": loss_t.data.item()},
+                                       (save_index * len(test_loader) + idx_test) * 8)
+        else:
+            Summary_Writer.add_scalar(dataset_name + "_" + args.STA_mode + "_test_loss", loss_t.data.item(),
+                                      save_index * len(test_loader) + idx_test)
+
+        dt = datetime.now().strftime("%y-%m-%d %H:%M:%S")
+        if idx_test % args.disp_interval == 0:
+            print('time:{}\t'
+                  'Batch: [{:4d}/{:4d}]\t'
+                  'Loss {:.4f})\t'.format(dt, idx_test, len(test_loader), loss_t.data.item()))
+
+        if not is_val or args.need_val_repic_save or (idx_test % (len(test_loader) // 4) == 0):
+            # is_test or you need to save all val_repic
+            # or (idx_test % (len(test_loader)//4)==0 which need to generate tensorboard pic)
+            h_x = F.softmax(x11, dim=1).data.squeeze()  # softmax 转化为概率
+            probs, index_of_pic = h_x.sort(1, True)  # 1行排序
+            probs = probs[:, 0]  # 排序后最大数值
+            index_of_pic = index_of_pic[:, 0]  # 排序后最大值索引
+
+            ind = torch.nonzero(onehot_label)  # [10, 28] -> 非0元素的行列索引
+
+            for i in range(ind.shape[0]):  # 非0元素的个数
+                batch_index, la = ind[i]  # 帧索引，类别索引
+
+                save_accu_map_folder = os.path.join(save_path_hh, "%02d_%s" % (la, id_category[la]), img_name[i][:-3])
+                if not os.path.exists(save_accu_map_folder):
+                    os.makedirs(save_accu_map_folder)
+                save_accu_map_path = os.path.join(save_accu_map_folder, img_name[i][-2:])
+                if la != index_of_pic[i]:
+                    save_accu_map_path += r"(wrong_%02d_%s)" % (index_of_pic[i], id_category[index_of_pic[i]])
+                atts = (map1[i] + map2[i]) / 2  # 计算两幅图的平均值
+                atts[atts < 0] = 0
+
+                att = atts[la].cpu().data.numpy()  # 转为numpy数组
+                att = np.rint(att / (att.max() + 1e-8) * 255)  # 归一化到0-255
+                att = np.array(att, np.uint8)
+                att = cv2.resize(att, (220, 220))  # 修改分辨率
+
+                heatmap = cv2.applyColorMap(att, cv2.COLORMAP_JET)
+                img = cv2.imread(os.path.join(Pic_path, img_name[i] + ".jpg"))
+                img = cv2.resize(img, (220, 220))
+                result = heatmap * 0.3 + img * 0.5
+                if (not is_val) or args.need_val_repic_save:
+                    cv2.imwrite(save_accu_map_path + '.png', att)  # 保存图片
+                    cv2.imwrite(save_accu_map_path + ".jpg", result)
+
+                if is_val:
+                    # if True:
+                    cv2.imwrite(save_accu_map_path + ".jpg", result)
+                    img = cv2.imread(save_accu_map_path + ".jpg")
+                    img1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                    result_show_list.append(img1)
+
+        if len(result_show_list) > 0:
+            Summary_Writer.add_images("result batch:" + str(idx_test), np.stack(result_show_list, 0),
+                                      save_index, dataformats="NHWC")
+
+
+def load_model_weight_bef_test(test_weight_id=-1):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    net, _ = get_model(args.STA_mode)
+    save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')
+
+    if test_weight_id == -1:
+        test_epoch = input(r"please input your test weight of your mode! Maybe is 10/20/.../best: ")
+    else:
+        test_epoch = str(test_weight_id)
+
+    if test_epoch == "best":
+        best_pth = os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
+        if os.path.exists(best_pth):
+            print("-----> find pretrained model weight in", best_pth)
+            state = torch.load(best_pth)
+            net.load_state_dict(state['state_dict'])
+            test_epoch = str(state['epoch'] + 1) + "_best"
+        else:
+            print("Error! There is not pretrained weight --" + test_epoch, "in", best_pth)
+            exit()
+
+    else:
+        num = int(test_epoch)
+        best_pth = os.path.join(save_weight_fold, "%s_%s_%03d" % (args.dataset_name, args.STA_mode, num) + '.pth')
+        if os.path.exists(best_pth):
+            print("-----> find pretrained model weight in", best_pth)
+            state = torch.load(best_pth)
+            net.load_state_dict(state)
+        else:
+            print("Error! There is not pretrained weight --" + test_epoch, "in", best_pth)
+            exit()
+
+    print("-----> success load pretrained weight form ", best_pth)
+    print("-----> let's test! -------------->")
+    net.to(device)
+
+    # ============================val()======================================
+    # writer = SummaryWriter(r'./test_result/log')
+    # test(model=net, Pic_path=args.Pic_path, is_val=False, save_index=0, batch_size=args.batch_size,
+    #      input_size=args.input_size, dataset_name=args.dataset_name, Summary_Writer=writer,
+    #      test_re_dir=r'./test_result')
+
+    # =============================test()====================================
+    test_result_dir = os.path.join(args.save_dir, args.STA_mode, r'./%s_test_result_%s/' % (args.STA_mode, test_epoch))  # 结果保存文件夹
+    if not os.path.exists(test_result_dir):
+        os.makedirs(test_result_dir)
+    writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, r'./test_log/', r'./%s_test_result_%s/' % (args.STA_mode, test_epoch)))
+    test(model=net, Pic_path=args.Pic_path, is_val=False,
+         save_index=0, batch_size=args.batch_size, input_size=args.input_size,
+         dataset_name=args.dataset_name, Summary_Writer=writer, test_re_dir=test_result_dir + r"/pic_result/")
+    writer.close()
+```
+
+
 
 ## 实验结果
 
 ### S model
 
-训练轮数：20
+训练轮数：30
 
-![07](./readme_pic/-7bvjkedz-Q/07.jpg)
+以下是训练损失和验证集损失：
 
-![07](./readme_pic/-7bvjkedz-Q/07.png)
+![image-20220921232432121](Readme.assets/image-20220921232432121.png)
 
-![09](./readme_pic/-7bvjkedz-Q/09.jpg)
 
-![09](./readme_pic/-7bvjkedz-Q/09.png)
 
-![00](./readme_pic/-9xKC8r1Ww0/00.jpg)
+分别在30个轮次的训练上跑测试集损失。可见第11轮的测试集损失最小。
 
-![00](./readme_pic/-9xKC8r1Ww0/00.png)
+![image-20220921231649504](Readme.assets/image-20220921231649504.png)
 
-![07](./readme_pic/--sbZ5YMSm4/07.jpg)
 
-![07](./readme_pic/--sbZ5YMSm4/07.png)
 
-训练时的验证集损失：
+以下是30轮（most）和11轮（test_loss_best）的对比：
 
-![image-20220831172848838](./readme_pic/S_val_loss.png)
+![image-20220921231555996](Readme.assets/image-20220921231555996.png)
+
+但是，从个人观察的结果来看，30轮结果相比于11轮显著性注视点更加集中，效果更好。
+
+|                       |                 epoch = 30                 |                 epoch = 11                 |
+| :-------------------: | :----------------------------------------: | :----------------------------------------: |
+|       Chainsaw        | ![01](Readme.assets/01-16637742440853.jpg) | ![01](Readme.assets/01-16637742163162.jpg) |
+| Race car, auto racing |        ![00](Readme.assets/00.jpg)         | ![00](Readme.assets/00-16637743691694.jpg) |
+|     Frying (food)     | ![06](Readme.assets/06-16637744732186.jpg) | ![06](Readme.assets/06-16637744514275.jpg) |
+
+以下是test_result (epoch=30)的展示:
+
+|    label    |            right            |                            wrong                             |         wrong_result          |
+| :---------: | :-------------------------: | :----------------------------------------------------------: | :---------------------------: |
+| Church bell | ![01](Readme.assets/01.jpg) |  ![01(wrong_02_Bark)](Readme.assets/01(wrong_02_Bark).jpg)   |             Bark              |
+|     bus     | ![03](Readme.assets/03.jpg) | ![01(wrong_04_Race car, auto racing)](Readme.assets/01(wrong_04_Race car, auto racing).jpg) |     Race car, auto racing     |
+|    Flute    | ![06](Readme.assets/06.jpg) | ![07(wrong_01_Male speech, man speaking)](Readme.assets/07(wrong_01_Male speech, man speaking).jpg) |   Male speech, man speaking   |
+|    horse    | ![02](Readme.assets/02.jpg) | ![03(wrong_03_Fixed-wing aircraft, airplane)](Readme.assets/03(wrong_03_Fixed-wing aircraft, airplane).jpg) | Fixed-wing aircraft, airplane |
+
+第30轮的验证损失反而增高了，从个人理解应该是由于视频种类有许多相近的地方，例如有多种乐器分类的画面都是音乐家在演奏，仅从低分辨率的图像很难将各种乐器准确的分辨出来，并且演奏的画面又与说话的视频种类类似，这很大程度的导致了较大的损失。随着训练的进行，特征的区域更加精确，范围缩小，各分类的概率相差更大，使分类结果错误更多。
 
 ### SA model
 
-训练轮数：115组数据
+训练轮数：10
 
 训练时的验证集损失：
 
-![SA_train_loss](./readme_pic/SA_train_loss.png)
+![image-20220921235102913](Readme.assets/image-20220921235102913.png)
+
+
+
+### ST model
+
+训练轮数：50轮
+
+训练损失（蓝色）和验证集损失（红色）
+
+![image-20220921225215974](Readme.assets/image-20220921225215974.png)
+
+在
+
+
+
+
+
+
+
