@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0c8a3c88-46e0-4914-b539-12283830cfc0" name="变更" comment="修改了bug">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/my_STA.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/my_STA.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
-    <list id="934ac1df-e8a6-4a37-b331-ef8202dc9dda" name="wjq 进行的变更" comment="">
-      <change beforePath="$PROJECT_DIR$/SA/SAmodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/SA/SAmodel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/args_config.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/args_config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,7 +146,7 @@
       <workItem from="1663756552934" duration="1165000" />
       <workItem from="1663758004172" duration="723000" />
       <workItem from="1663763378279" duration="3270000" />
-      <workItem from="1663768543141" duration="1233000" />
+      <workItem from="1663768543141" duration="2989000" />
     </task>
     <task id="LOCAL-00001" summary="hello world">
       <created>1661611421441</created>
@@ -294,7 +288,21 @@
       <option name="project" value="LOCAL" />
       <updated>1663688941425</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="修改了bug">
+      <created>1663770100789</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1663770100789</updated>
+    </task>
+    <task id="LOCAL-00022" summary="wjq 进行的变更">
+      <created>1663770110847</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1663770110847</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -330,17 +338,19 @@
     <MESSAGE value="修改了损失函数" />
     <MESSAGE value="STA代码完成，修改了所有结果和权重的保存位置" />
     <MESSAGE value="修改了bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改了bug" />
+    <MESSAGE value="wjq 进行的变更" />
+    <option name="LAST_COMMIT_MESSAGE" value="wjq 进行的变更" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/my_STA$DataFromtxt.coverage" NAME="DataFromtxt 覆盖结果" MODIFIED="1663671665761" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
     <SUITE FILE_PATH="coverage/my_STA$DataFromtxt__1_.coverage" NAME="DataFromtxt (1) 覆盖结果" MODIFIED="1661590826864" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
+    <SUITE FILE_PATH="coverage/STA_trial$args_config.coverage" NAME="args_config 覆盖结果" MODIFIED="1663770043284" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
     <SUITE FILE_PATH="coverage/my_STA$train__2_.coverage" NAME="train (2) 覆盖结果" MODIFIED="1663341161154" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ST" />
     <SUITE FILE_PATH="coverage/my_STA$test.coverage" NAME="test 覆盖结果" MODIFIED="1663718455575" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/S" />
     <SUITE FILE_PATH="coverage/my_STA$main__1_.coverage" NAME="main (1) 覆盖结果" MODIFIED="1661871333433" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/my_STA$DataSet.coverage" NAME="DataSet 覆盖结果" MODIFIED="1663317234026" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
     <SUITE FILE_PATH="coverage/my_STA$train__1_.coverage" NAME="train (1) 覆盖结果" MODIFIED="1663118479900" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SA" />
-    <SUITE FILE_PATH="coverage/STA_trial$train.coverage" NAME="train 覆盖结果" MODIFIED="1663769330723" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/STA_trial$train.coverage" NAME="train 覆盖结果" MODIFIED="1663775403834" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/my_STA$main.coverage" NAME="main 覆盖结果" MODIFIED="1661593570466" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/my_STA$mytest1.coverage" NAME="mytest1 覆盖结果" MODIFIED="1661696192194" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/my_tensorbord_test" />
     <SUITE FILE_PATH="coverage/my_STA$AVE_modify.coverage" NAME="AVE_modify 覆盖结果" MODIFIED="1661585110260" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/config" />

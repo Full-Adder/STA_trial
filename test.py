@@ -10,6 +10,8 @@ from datetime import datetime
 from utils.model_tool import get_model
 from utils.DataFromtxt import id_category
 
+args = get_parser()
+
 
 def test(model, Pic_path, H5_path, is_val, save_index, batch_size,
          input_size, dataset_name, Summary_Writer, test_re_dir):
@@ -176,7 +178,7 @@ def load_model_weight_bef_test(test_weight_id=-1):
 
 
 if __name__ == '__main__':
-    args = get_parser()
+    # args = get_parser()
     # load_model_weight_bef_test(30)
 
     for i in range(1, 30):
