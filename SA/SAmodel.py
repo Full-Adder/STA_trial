@@ -13,7 +13,7 @@ class SANetModel(nn.Module):
         all_channel = 28
 
         Amodel = SoundNet()
-        checkpoint = torch.load('vggsound_netvlad.pth.tar')
+        checkpoint = torch.load('./SA/vggsound_netvlad.pth.tar')
         Amodel.load_state_dict(checkpoint['model_state_dict'])
         Amodel = list(Amodel.audnet.children())
         self.audio_model = nn.Sequential(*Amodel[:9])
@@ -24,7 +24,7 @@ class SANetModel(nn.Module):
 
 
         # net = torch.hub.load('facebookresearch/WSL-Images', 'resnext101_32x8d_wsl')
-        net = torch.hub.load('../tmp/facebookresearch_WSL-Images_main', 'resnext101_32x8d_wsl', source='local')
+        net = torch.hub.load('./tmp/facebookresearch_WSL-Images_main', 'resnext101_32x8d_wsl', source='local')
         net = list(net.children())
         self.features = nn.Sequential(*net[:8])
 
