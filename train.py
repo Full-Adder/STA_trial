@@ -47,7 +47,7 @@ def train(args):
 
             if args.STA_mode == "S":
                 img_name, img1, class_id, onehot_label = dat
-                class_id.to(device)
+                class_id = class_id.to(device)
                 img1 = img1.to(device)
 
                 if epoch == 0 and idx == 0:
