@@ -21,7 +21,7 @@ def get_parser():
     # -----------------------------------------------------------------------------
     parser.add_argument("--need_val_repic_save", type=bool, default=False, help="Do you want to save all result_pic when val ?")
     parser.add_argument("--train_mode", type=str, default=r"train", help="train/test/val")
-    parser.add_argument("--STA_mode", type=str, default=r"SA", help="S/ST/SA/STA")
+    parser.add_argument("--STA_mode", type=str, default=r"ST", help="S/ST/SA/STA")
     parser.add_argument("--val_Pepoch", type=int, default=1)
     parser.add_argument("--weight_decay", type=float, default=0.0005)
     parser.add_argument("--input_size", type=int, default=300)
