@@ -19,7 +19,7 @@ class SNetModel(nn.Module):  # 定义S
         all_channel = 28
 
         # net = torch.hub.load('facebookresearch/WSL-Images', 'resnext101_32x8d_wsl')
-        net = torch.hub.load('../tmp/facebookresearch_WSL-Images_main', 'resnext101_32x8d_wsl', source='local')
+        net = torch.hub.load('./tmp/facebookresearch_WSL-Images_main', 'resnext101_32x8d_wsl', source='local')
         net = list(net.children())  # 列出 net 的外面7组
         self.features = nn.Sequential(*net[:7])  # 取前7组
 
