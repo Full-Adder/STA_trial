@@ -18,7 +18,7 @@ class STNetModel(nn.Module):
         self.map_2 = None
         self.map_1 = None
         # net = torch.hub.load('facebookresearch/WSL-Images', 'resnext101_32x8d_wsl')
-        net = torch.hub.load('../tmp/facebookresearch_WSL-Images_main', 'resnext101_32x8d_wsl', source='local')
+        net = torch.hub.load('./tmp/facebookresearch_WSL-Images_main', 'resnext101_32x8d_wsl', source='local')
         net = list(net.children())
         self.features = nn.Sequential(*net[:8])
 

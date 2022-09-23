@@ -137,8 +137,8 @@ class AVEDataset(Dataset):  # 数据集类
             return data[0], image, audio, class_id, onehot_label  # 返回 图片地址 图片tensor 标签 onehot标签
 
         else:
-            img_bef_path = os.path.join(self.pic_dir, video_name, "%02d" % (id - 1) + ".jpg")  # 前一张图片的地址
-            img_aft_path = os.path.join(self.pic_dir, video_name, "%02d" % (id + 1) + ".jpg")  # 后一张图片的地址
+            img_bef_path = os.path.join(self.pic_dir, video_name, "%02d" % (id - 1) + ".jpg")# 前
+            img_aft_path = os.path.join(self.pic_dir, video_name, "%02d" % (id + 1) + ".jpg")# 后
             image_bef = Image.open(img_bef_path).convert('RGB')
             image_aft = Image.open(img_aft_path).convert('RGB')
             image_bef = self.transform(image_bef)
@@ -162,7 +162,8 @@ def get_dataLoader(Pic_path=r"../AVE_Dataset/Video", H5_path=r"../AVE_Dataset/H5
 
     tsfm_train = transforms.Compose([transforms.Resize((input_size, input_size)),
                                      transforms.RandomCrop((crop_size, crop_size)),
-                                     transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),
+                                     transforms.ColorJitter(brightness=0.3, contrast=0.3, 
+                                                            saturation=0.3, hue=0.1),
                                      transforms.ToTensor(),
                                      transforms.Normalize(mean_vals, std_vals),
                                      ])
@@ -173,19 +174,25 @@ def get_dataLoader(Pic_path=r"../AVE_Dataset/Video", H5_path=r"../AVE_Dataset/H5
                                     ])
 
     if train_mode == "train":
-        img_train = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, mode="train", transform=tsfm_train, STA_mode=STA_mode)
+        img_train = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, 
+                               mode="train", transform=tsfm_train, STA_mode=STA_mode)
         train_loader = DataLoader(img_train, batch_size=batch_size, shuffle=True, drop_last=True)
-        print("dataSet.len:", len(img_train), "\t dataLoader.len:", len(train_loader), 'batch_size:', batch_size)
+        print("dataSet.len:", len(img_train), "\t dataLoader.len:", 
+              len(train_loader), 'batch_size:', batch_size)
         return train_loader
     elif train_mode == "test":
-        img_test = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, mode="test", transform=tsfm_test, STA_mode=STA_mode)
+        img_test = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, 
+                              mode="test", transform=tsfm_test, STA_mode=STA_mode)
         test_loader = DataLoader(img_test, batch_size=batch_size, shuffle=False, drop_last=True)
-        print("dataSet.len:", len(img_test), "\t dataLoader.len:", len(test_loader), 'batch_size:', batch_size)
+        print("dataSet.len:", len(img_test), "\t dataLoader.len:", 
+              len(test_loader), 'batch_size:', batch_size)
         return test_loader
     elif train_mode == "val":
-        img_val = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, mode="val", transform=tsfm_test, STA_mode=STA_mode)
+        img_val = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, 
+                             mode="val", transform=tsfm_test, STA_mode=STA_mode)
         val_loader = DataLoader(img_val, batch_size=batch_size, shuffle=False, drop_last=True)
-        print("dataSet.len:", len(val_loader), "\t dataLoader.len:", len(val_loader), 'batch_size:', batch_size)
+        print("dataSet.len:", len(val_loader), "\t dataLoader.len:", 
+              len(val_loader), 'batch_size:', batch_size)
         return val_loader
 ```
 
@@ -613,60 +620,97 @@ def load_model_weight_bef_test(test_weight_id=-1):
 
 ### S model
 
-训练轮数：30
+训练轮数：50		batch_size = 64
 
 以下是训练损失和验证集损失：
 
-![image-20220921232432121](Readme.assets/image-20220921232432121.png)
+![image-20220923160949393](Readme.assets/S_train_val.png)
 
 
 
-分别在30个轮次的训练上跑测试集损失。可见第11轮的测试集损失最小。
+分别在50个轮次的训练上跑测试集损失。可见第11轮的测试集损失最小。
 
-![image-20220921231649504](Readme.assets/image-20220921231649504.png)
+![image-20220923132321108](Readme.assets/S/S_test_all.png)
 
 
 
-以下是30轮（most）和11轮（test_loss_best）的对比：
+以下是50轮（most）、30轮、11轮（test_loss_best）的对比：
 
-![image-20220921231555996](Readme.assets/image-20220921231555996.png)
+![image-20220923140343201](Readme.assets/S/S_test_50_30_11.png)
 
-但是，从个人观察的结果来看，30轮结果相比于11轮显著性注视点更加集中，效果更好。
+但是，从个人观察的结果来看，50轮和30轮的结果相比于11轮显著性注视点更加集中，效果更好。
 
-|                       |                 epoch = 30                 |                 epoch = 11                 |
-| :-------------------: | :----------------------------------------: | :----------------------------------------: |
-|       Chainsaw        | ![01](Readme.assets/01-16637742440853.jpg) | ![01](Readme.assets/01-16637742163162.jpg) |
-| Race car, auto racing |        ![00](Readme.assets/00.jpg)         | ![00](Readme.assets/00-16637743691694.jpg) |
-|     Frying (food)     | ![06](Readme.assets/06-16637744732186.jpg) | ![06](Readme.assets/06-16637744514275.jpg) |
+|                       |                          epoch = 50                          |                          epoch = 30                          |                     epoch = 11                     |
+| :-------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :------------------------------------------------: |
+|       Chainsaw        |      ![01](Readme.assets/S/S_test_re_ep50_chainswa.jpg)      | ![01-16637742440853](Readme.assets/S/S_test_re_ep30_chainswa.jpg) | ![01](Readme.assets/S/S_test_re_ep50_chainswa.jpg) |
+| Race car, auto racing | ![00(wrong_11_Truck)](Readme.assets/S/S_test_re_ep50_racecar.jpg) |      ![00](Readme.assets/S/S_test_re_ep30_racecar.jpg)       | ![00](Readme.assets/S/S_test_re_ep11_racecar.jpg)  |
+|     Frying (food)     |        ![06](Readme.assets/S/S_test_re_ep50_food.jpg)        | ![06-16637744732186](Readme.assets/S/S_test_re_ep30_food.jpg) |   ![06](Readme.assets/S/S_test_re_ep11_food.jpg)   |
 
-以下是test_result (epoch=30)的展示:
+以下是test_result (epoch=50)的展示:
 
-|    label    |            right            |                               wrong                               |         wrong_result          |
-|:-----------:|:---------------------------:|:-----------------------------------------------------------------:|:-----------------------------:|
-| Church bell | ![01](Readme.assets/01.jpg) |     ![01(wrong_02_Bark)](Readme.assets/01(wrong_02_Bark).jpg)     |             Bark              |
-|     bus     | ![03](Readme.assets/03.jpg) |     ![01](Readme.assets/01(wrong_04_Racecar,autoracing).jpg)      |     Race car, auto racing     |
-|    Flute    | ![06](Readme.assets/06.jpg) |   ![07](Readme.assets/07(wrong_01_Malespeech,manspeaking).jpg)    |   Male speech, man speaking   |
-|    horse    | ![02](Readme.assets/02.jpg) | ![03](Readme.assets/03(wrong_03_Fixed-wingaircraft,airplane).jpg) | Fixed-wing aircraft, airplane |
+|           label           |                        right                         |                            wrong                             |     wrong_result      |
+| :-----------------------: | :--------------------------------------------------: | :----------------------------------------------------------: | :-------------------: |
+|        Church bell        | ![right](./Readme.assets/S/S_test_50_bell_right.jpg) |     ![wrong](./Readme.assets/S/S_test_50_bell_wrong.jpg)     |     Frying (food)     |
+| Male speech, man speaking |       ![](Readme.assets/S/men_talk_right.jpg)        | ![02(wrong_19_Baby cry, infant cry)](./Readme.assets/S/wrong_19_Baby_cry_infant_cry.jpg) | Baby cry, infant cry  |
+|           Flute           |          ![01](./Readme.assets/S/Flute.jpg)          |            ![wrong](Readme.assets/S/wrong_04.jpg)            | Race car, auto racing |
 
-第30轮的验证损失反而增高了，从个人理解应该是由于视频种类有许多相近的地方，例如有多种乐器分类的画面都是音乐家在演奏，仅从低分辨率的图像很难将各种乐器准确的分辨出来，并且演奏的画面又与说话的视频种类类似，这很大程度的导致了较大的损失。随着训练的进行，特征的区域更加精确，范围缩小，各分类的概率相差更大，使分类结果错误更多。
+第30轮的验证损失反而增高了，从个人理解应该是由于视频种类有许多相近的地方，例如有多种乐器分类的画面都是音乐家在演奏，仅从低分辨率的图像很难将各种乐器准确的分辨出来，并且演奏的画面又与说话的视频种类类似，这很大程度的导致类别的判断失误。随着训练的进行，特征的区域更加精确，范围缩小，各分类的概率相差更大，使分类结果错误更多。
+
+更多结果(epoch=50,验证集部分结果)：
+
+![img](Readme.assets/S/val_list_1.png)
+
+
+
+![img](Readme.assets/S/val_list_2.png)
+
+
 
 ### SA model
 
-训练轮数：10
+训练轮数：50		batch_size = 40
 
-训练时的验证集损失：
+训练的训练集和验证集损失：
 
-![image-20220921235102913](Readme.assets/image-20220921235102913.png)
+![image-20220922172816657](Readme.assets/SA_train_val.png)
+
+各权重在测试集上的表现，epoch = 12 时表现最好。
+
+![image-20220923230800759](Readme.assets/SA/test_loss_all.png)
 
 
+
+拿出epoch=12,30,50 的loss进行对比
+
+![teaskj](Readme.assets/SA/test_12_30_50.png)
+
+
+
+对比结果，显著性区域更加集中。
+
+|         label         |                          epoch = 50                          |                   epoch = 30                   |                         epoch = 12                         |
+| :-------------------: | :----------------------------------------------------------: | :--------------------------------------------: | :--------------------------------------------------------: |
+|       Chainsaw        | ![01(wrong_15_Train horn)](Readme.assets/SA/01(wrong_15_Train horn).jpg) |         ![01](Readme.assets/SA/01.jpg)         |       ![01](Readme.assets/SA/01-16639462825129.jpg)        |
+| Race car, auto racing |        ![00](Readme.assets/SA/00-166394644859410.jpg)        |         ![00](Readme.assets/SA/00.jpg)         | ![00(wrong_20_Bus)](Readme.assets/SA/00(wrong_20_Bus).jpg) |
+|         Flute         |                ![06](Readme.assets/SA/06.jpg)                | ![06](Readme.assets/SA/06-166394652487511.jpg) |       ![06](Readme.assets/SA/06-166394654857512.jpg)       |
+
+
+
+部分验证集的结果拼图：（尤其在乐器和发声的场景种准确率有了很大提高）
+
+![val_list_1](Readme.assets/SA/val_list_1.png)
+
+
+
+![val_list_2](Readme.assets/SA/val_list_2.png)
 
 ### ST model
 
-训练轮数：50轮
+训练轮数：50轮 	batch_size = 20
 
 训练损失（蓝色）和验证集损失（红色）
 
-![image-20220921225215974](Readme.assets/image-20220921225215974.png)
+![image-20220922173236985](Readme.assets/ST_train_val.png)
 
 在
 

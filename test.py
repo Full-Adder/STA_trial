@@ -171,7 +171,7 @@ def load_model_weight_bef_test(test_weight_id=-1):
     if not os.path.exists(test_result_dir):
         os.makedirs(test_result_dir)
     writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, r'./test_log/', r'./%s_test_result_%s/' % (args.STA_mode, test_epoch)))
-    test(model=net, Pic_path=args.Pic_path, is_val=False,
+    test(model=net, Pic_path=args.Pic_path, H5_path=args.H5_path, is_val=False,
          save_index=0, batch_size=args.batch_size, input_size=args.input_size,
          dataset_name=args.dataset_name, Summary_Writer=writer, test_re_dir=test_result_dir + r"/pic_result/")
     writer.close()
@@ -181,7 +181,7 @@ if __name__ == '__main__':
     # args = get_parser()
     # load_model_weight_bef_test(30)
 
-    for i in range(1, 30):
+    for i in range(10, 11):
         print("now let's test weight", i)
         load_model_weight_bef_test(i)
 
