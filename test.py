@@ -1,8 +1,11 @@
 import torch
+import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 import cv2
 import os
+
+from STA.loss import KLDLoss
 from utils.args_config import get_parser
 from torch.utils.tensorboard import SummaryWriter
 from utils.DataLoader import get_dataLoader
@@ -61,7 +64,39 @@ def test(model, Pic_path, H5_path, is_val, save_index, batch_size,
                          + 0.6 * (F.cross_entropy(x1, class_id) + F.cross_entropy(x2, class_id)
                                   + F.cross_entropy(x3, class_id))
             else:
-                pass
+                img_name, img_bef, aud_bef, gt_bef, img_1, aud_now, gt_now, \
+                img_aft, aud_aft, gt_aft, class_id, onehot_label = dat_test
+
+                img_bef = img_bef.to(device)
+                img_now = img_1.to(device)
+                img_aft = img_aft.to(device)
+                aud_bef = aud_aft.to(device)
+                aud_now = aud_now.to(device)
+                aud_aft = aud_aft.to(device)
+                gt_bef = gt_bef.to(device)
+                gt_now = gt_now.to(device)
+                gt_aft = gt_aft.to(device)
+                audiocls = torch.load(r'STA/AudioSwitch.pt')
+                audiocls.cuda().eval()
+                with torch.no_grad():
+                    switch_bef = audiocls(aud_bef, img_bef)
+                    switch_now = audiocls(aud_now, img_now)
+                    switch_aft = audiocls(aud_aft, img_aft)
+                loss2 = nn.BCEWithLogitsLoss().to(device)
+                loss1 = KLDLoss().to(device)
+
+                p04, p03, p02, p14, p13, p12, p24, p23, p22 = \
+                    model(img_bef, img_now, img_aft, aud_bef, aud_now, aud_aft,
+                          switch_bef, switch_now, switch_aft)
+
+                loss_t = loss2(p04, gt_bef) + loss2(p14, gt_now) + loss2(p24, gt_aft) + \
+                             loss2(p03, gt_bef) + loss2(p13, gt_now) + loss2(p23, gt_aft) + \
+                             loss2(p02, gt_bef) + loss2(p12, gt_now) + loss2(p22, gt_aft) + \
+                             loss1(F.sigmoid(p04), gt_bef) + loss1(F.sigmoid(p14), gt_now) + \
+                             loss1(F.sigmoid(p24), gt_aft) + loss1(F.sigmoid(p03), gt_bef) + \
+                             loss1(F.sigmoid(p13), gt_now) + loss1(F.sigmoid(p23), gt_aft) + \
+                             loss1(F.sigmoid(p02), gt_bef) + loss1(F.sigmoid(p12), gt_now) + \
+                             loss1(F.sigmoid(p22), gt_aft)
 
         result_show_list = []
         if is_val:
@@ -167,10 +202,12 @@ def load_model_weight_bef_test(test_weight_id=-1):
     #      test_re_dir=r'./test_result')
 
     # =============================test()====================================
-    test_result_dir = os.path.join(args.save_dir, args.STA_mode, r'./%s_test_result_%s/' % (args.STA_mode, test_epoch))  # 结果保存文件夹
+    test_result_dir = os.path.join(args.save_dir, args.STA_mode,
+                                   r'./%s_test_result_%s/' % (args.STA_mode, test_epoch))  # 结果保存文件夹
     if not os.path.exists(test_result_dir):
         os.makedirs(test_result_dir)
-    writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, r'./test_log/', r'./%s_test_result_%s/' % (args.STA_mode, test_epoch)))
+    writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, r'./test_log/',
+                                        r'./%s_test_result_%s/' % (args.STA_mode, test_epoch)))
     test(model=net, Pic_path=args.Pic_path, H5_path=args.H5_path, is_val=False,
          save_index=0, batch_size=args.batch_size, input_size=args.input_size,
          dataset_name=args.dataset_name, Summary_Writer=writer, test_re_dir=test_result_dir + r"/pic_result/")

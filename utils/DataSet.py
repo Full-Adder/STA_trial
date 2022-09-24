@@ -72,7 +72,9 @@ class AVEDataset(Dataset):  # 数据集类
                 return data[0], image_bef, image, image_aft, class_id, onehot_label
 
             else:  # "STA"
-                pass
+
+                return data[0], image_bef, aud_bef, gt_bef, image, aud_now, gt_now, \
+                       image_aft, aud_aft, gt_aft, class_id, onehot_label
 
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 import os
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
+from STA.loss import KLDLoss
 from utils.args_config import get_parser
 from utils.DataLoader import get_dataLoader
 from utils.avgMeter import AverageMeter
@@ -85,7 +87,42 @@ def train(args):
                              + 0.6 * (F.cross_entropy(x1, class_id) + F.cross_entropy(x2, class_id)
                                       + F.cross_entropy(x3, class_id))
             else:
-                pass
+                img_name, img_bef, aud_bef, gt_bef, img_1, aud_now, gt_now, \
+                img_aft, aud_aft, gt_aft, class_id, onehot_label = dat
+
+                img_bef = img_bef.to(device)
+                img_now = img_1.to(device)
+                img_aft = img_aft.to(device)
+                aud_bef = aud_aft.to(device)
+                aud_now = aud_now.to(device)
+                aud_aft = aud_aft.to(device)
+                gt_bef = gt_bef.to(device)
+                gt_now = gt_now.to(device)
+                gt_aft = gt_aft.to(device)
+                audiocls = torch.load(r'STA/AudioSwitch.pt')
+                audiocls.cuda().eval()
+                with torch.no_grad():
+                    switch_bef = audiocls(aud_bef, img_bef)
+                    switch_now = audiocls(aud_now, img_now)
+                    switch_aft = audiocls(aud_aft, img_aft)
+                loss2 = nn.BCEWithLogitsLoss().to(device)
+                loss1 = KLDLoss().to(device)
+
+                if epoch == 0 and idx == 0:
+                    writer.add_graph(model, [img_bef, img_now, img_aft])
+
+                p04, p03, p02, p14, p13, p12, p24, p23, p22 = \
+                    model(img_bef, img_now, img_aft, aud_bef, aud_now, aud_aft,
+                          switch_bef, switch_now, switch_aft)
+
+                loss_train = loss2(p04, gt_bef) + loss2(p14, gt_now) + loss2(p24, gt_aft) + \
+                             loss2(p03, gt_bef) + loss2(p13, gt_now) + loss2(p23, gt_aft) + \
+                             loss2(p02, gt_bef) + loss2(p12, gt_now) + loss2(p22, gt_aft) + \
+                             loss1(F.sigmoid(p04), gt_bef) + loss1(F.sigmoid(p14), gt_now) + \
+                             loss1(F.sigmoid(p24), gt_aft) + loss1(F.sigmoid(p03), gt_bef) + \
+                             loss1(F.sigmoid(p13), gt_now) + loss1(F.sigmoid(p23), gt_aft) + \
+                             loss1(F.sigmoid(p02), gt_bef) + loss1(F.sigmoid(p12), gt_now) + \
+                             loss1(F.sigmoid(p22), gt_aft)
 
             optimizer.zero_grad()
             loss_train.backward()
