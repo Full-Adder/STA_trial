@@ -728,11 +728,11 @@ def load_model_weight_bef_test(test_weight_id=-1):
 
 
 
-|         label         |                    epoch = 50                    |                          epoch = 30                          |                          epoch = 12                          |
-| :-------------------: | :----------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-|       Chainsaw        | ![01wrong_15_Trainhorn](Readme.assets/ST/01.jpg) |        ![01](Readme.assets/ST/01-16640147534063.jpg)         |        ![01](Readme.assets/ST/01-16640148118855.jpg)         |
-| Race car, auto racing |  ![01](Readme.assets/ST/01-16640142427841.jpg)   | ![01(wrong_03_Fixed-wing aircraft, airplane)](Readme.assets/ST/01(wrong_03_Fixed-wing aircraft, airplane).jpg) |        ![01](Readme.assets/ST/01-16640147886264.jpg)         |
-|     Frying (food)     |  ![01](Readme.assets/ST/01-16640146291822.jpg)   | ![01(wrong_16_Clock)](Readme.assets/ST/01(wrong_16_Clock).jpg) | ![01(wrong_24_Toilet flush)](Readme.assets/ST/01(wrong_24_Toilet flush).jpg) |
+|         label         |                    epoch = 50                    |                                                 epoch = 30                                                  |                                  epoch = 9                                  |
+|:---------------------:|:------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------:|
+|       Chainsaw        | ![01wrong_15_Trainhorn](Readme.assets/ST/01.jpg) |                                ![01](Readme.assets/ST/01-16640147534063.jpg)                                |                ![01](Readme.assets/ST/01-16640148118855.jpg)                |
+| Race car, auto racing |  ![01](Readme.assets/ST/01-16640142427841.jpg)   | ![01(wrong_03_Fixed-wing aircraft, airplane)](Readme.assets/ST/01(wrong_03_Fixed-wingaircraftairplane).jpg) |                ![01](Readme.assets/ST/01-16640147886264.jpg)                |
+|     Frying (food)     |  ![01](Readme.assets/ST/01-16640146291822.jpg)   |                       ![01(wrong_16_Clock)](Readme.assets/ST/01(wrong_16_Clock).jpg)                        | ![01(wrong_24_Toilet flush)](Readme.assets/ST/01(wrong_24_Toiletflush).jpg) |
 
 
 
