@@ -30,7 +30,7 @@ def get_dataLoader(Pic_path=arg.Pic_path, H5_path=arg.H5_path, train_mode=arg.tr
         return train_loader
     elif train_mode == "test":
         img_test = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, mode="test", transform=tsfm_test, STA_mode=STA_mode)
-        test_loader = DataLoader(img_test, batch_size=batch_size, shuffle=True, drop_last=True)
+        test_loader = DataLoader(img_test, batch_size=batch_size, shuffle=True, drop_last=False)
         print("TestSet.len:", len(img_test), "\t dataLoader.len:", len(test_loader), 'batch_size:', batch_size)
         return test_loader
     elif train_mode == "val":
