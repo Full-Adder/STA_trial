@@ -17,6 +17,7 @@ def get_parser():
     parser.add_argument("--Video_path", type=str, default=r"D:\WorkPlace\Python\my_STA\AVE_Dataset\Video")
     parser.add_argument("--Pic_path", type=str, default=r"D:\WorkPlace\Python\my_STA\AVE_Dataset\Picture")
     parser.add_argument("--H5_path", type=str, default=r"D:\WorkPlace\Python\my_STA\AVE_Dataset\H5")
+    parser.add_argument("--GT_path", type=str, default=r"D:\WorkPlace\Python\my_STA\AVE_Dataset\GT")
     parser.add_argument("--save_dir", type=str, default=r'D:\WorkPlace\Python\my_STA\Result')
     # -----------------------------------------------------------------------------
     parser.add_argument("--need_val_repic_save", type=bool, default=False, help="Do you want to save all result_pic when val ?")

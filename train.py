@@ -16,8 +16,8 @@ def train(args):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     losses = AverageMeter()
 
-    train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, train_mode="train",
-                                  STA_mode=args.STA_mode, batch_size=args.batch_size,
+    train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, gt_dir=args.GT_path,
+                                  train_mode="train", STA_mode=args.STA_mode, batch_size=args.batch_size,
                                   input_size=args.input_size, crop_size=args.crop_size)
     model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
 
