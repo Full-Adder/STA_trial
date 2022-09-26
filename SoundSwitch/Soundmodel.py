@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
-from ResNet import resnet
+from SoundSwitch.ResNet import resnet
 
 class SoundNet(nn.Module):
 

@@ -48,8 +48,8 @@ class SNetModel(nn.Module):  # 定义S
         x2 = self.extra_conv_fusion(torch.cat((x1, self.self_attention(x1)), 1))
         x2 = self.extra_ConvGRU(x2, x1)
 
-        self.map_1 = x1.clone()  # 1,28,32,32
-        x1ss = F.avg_pool2d(x1, kernel_size=(x1.size(2), x1.size(3)), padding=0)  # 1,28,1,1
+        self.map_1 = x1.clone()  # 1,28,32,32     28个future_map
+        x1ss = F.avg_pool2d(x1, kernel_size=(x1.size(2), x1.size(3)), padding=0)  # 1,28,1,1  全局平均池化
         x1ss = x1ss.view(-1, 28)  # 1,28
 
         self.map_2 = x2.clone()  # 1,28,32,32

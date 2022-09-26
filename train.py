@@ -16,7 +16,7 @@ def train(args):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     losses = AverageMeter()
 
-    train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, gt_dir=args.GT_path,
+    train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path,
                                   train_mode="train", STA_mode=args.STA_mode, batch_size=args.batch_size,
                                   input_size=args.input_size, crop_size=args.crop_size)
     model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
@@ -91,7 +91,7 @@ def train(args):
                 img_aft, aud_aft, gt_aft, class_id, onehot_label = dat
 
                 img_bef = img_bef.to(device)
-                img_now = img_1.to(device)
+                img_1 = img_1.to(device)
                 img_aft = img_aft.to(device)
                 aud_bef = aud_aft.to(device)
                 aud_now = aud_now.to(device)
@@ -103,8 +103,11 @@ def train(args):
                 audiocls.cuda().eval()
                 with torch.no_grad():
                     switch_bef = audiocls(aud_bef, img_bef)
-                    switch_now = audiocls(aud_now, img_now)
+                    switch_now = audiocls(aud_now, img_1)
                     switch_aft = audiocls(aud_aft, img_aft)
+                switch_bef = switch_bef.to(device)
+                switch_now = switch_now.to(device)
+                switch_aft = switch_aft.to(device)
                 loss2 = nn.BCEWithLogitsLoss().to(device)
                 loss1 = KLDLoss().to(device)
 
@@ -113,7 +116,7 @@ def train(args):
                                              switch_bef, switch_now, switch_aft])
 
                 p04, p03, p02, p14, p13, p12, p24, p23, p22 = \
-                    model(img_bef, img_now, img_aft, aud_bef, aud_now, aud_aft,
+                    model(img_bef, img_1, img_aft, aud_bef, aud_now, aud_aft,
                           switch_bef, switch_now, switch_aft)
 
                 loss_train = loss2(p04, gt_bef) + loss2(p14, gt_now) + loss2(p24, gt_aft) + \
@@ -143,7 +146,7 @@ def train(args):
 
         if (epoch + 1) % args.val_Pepoch == 0:
             print("------------------------------val:start-----------------------------")
-            test(model, args.Pic_path, args.H5_path, True, epoch, args.batch_size,
+            test(model, args.Pic_path, args.H5_path, args.GT_path, True, epoch, args.batch_size,
                  args.input_size, args.dataset_name, writer, val_re_save_path)
             print("------------------------------ val:end -----------------------------")
 

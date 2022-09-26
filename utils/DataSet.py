@@ -1,5 +1,4 @@
 import os
-
 import h5py
 import torch
 from torch.utils.data import Dataset
@@ -7,6 +6,7 @@ from torchvision import transforms
 import numpy as np
 from PIL import Image
 import utils.DataFromtxt as dft
+from utils.args_config import get_parser
 
 Data_path = r"../AVE_Dataset"
 Video_path = r"../AVE_Dataset/Video"
@@ -16,14 +16,15 @@ H5_path = r"../AVE_Dataset/H5"
 
 
 class AVEDataset(Dataset):  # 数据集类
-    def __init__(self, pic_dir, h5_dir, gt_dir, mode, transform, STA_mode):
-        assert mode in list(dft.get_txtList().keys()), "mode must be train/test/val"
+    def __init__(self, pic_dir, h5_dir, gt_dir, STA_mode, mode, transform, transforms_gt):
+        assert mode in list(dft.get_txtList().keys()), "mode must be train/test/val/all"
         assert STA_mode in ["S", "ST", "SA", "STA"], "STA_mode must be S/SA/ST/STA"
         self.pic_dir = pic_dir
         self.h5_dir = h5_dir
         self.gt_dir = gt_dir
         self.mode = mode
         self.transform = transform
+        self.transform_gt = transforms_gt
         self.STA_mode = STA_mode
         self.class_dir = dft.get_category_to_key()
         data_folder_list = dft.readDataTxt(os.path.join(self.pic_dir, "../"), mode)
@@ -81,14 +82,20 @@ class AVEDataset(Dataset):  # 数据集类
         aud_bef = torch.from_numpy(audio_features_bef).float()
         aud_aft = torch.from_numpy(audio_features_aft).float()
 
-        
-        
+        gt_bef_path = os.path.join(self.gt_dir, video_name, "%02d" % (id - 1) + ".jpg")
+        gt_now_path = os.path.join(self.gt_dir, video_name, "%02d" % id + ".jpg")
+        gt_aft_path = os.path.join(self.gt_dir, video_name, "%02d" % (id + 1) + ".jpg")
+        gt_bef = self.transform_gt(Image.open(gt_bef_path).convert('L'))
+        gt_now = self.transform_gt(Image.open(gt_now_path).convert('L'))
+        gt_aft = self.transform_gt(Image.open(gt_aft_path).convert('L'))
+
         return data[0], image_bef, aud_bef, gt_bef, image, audio, gt_now, image_aft, aud_aft, gt_aft, class_id, onehot_label
 
 
 if __name__ == "__main__":
-    x = AVEDataset(pic_dir="../AVE_Dataset/Picture", h5_dir=r"../AVE_Dataset/H5", gt_dir="./",
-                   mode="train", transform=transforms.ToTensor(), STA_mode="S")
+    args = get_parser()
+    x = AVEDataset(pic_dir=args.Pic_path, h5_dir=args.H5_path, gt_dir=args.GT_path,
+                   mode="train", transform=transforms.ToTensor(), transforms_gt=None, STA_mode="S")
     print(len(x))
     for i in x:
         print(i)

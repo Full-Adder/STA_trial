@@ -1,8 +1,9 @@
-from SA.Soundmodel import SoundNet
-from utils.ConvGRU import ConvGRUCell
-import torch.nn as nn
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
+
+from SoundSwitch.Soundmodel import SoundNet
+from utils.ConvGRU import ConvGRUCell
 
 affine_par = True
 
@@ -13,7 +14,7 @@ class STANet(nn.Module):
         all_channel = 28
 
         Amodel = SoundNet()
-        checkpoint = torch.load(r'../SA/vggsound_netvlad.pth.tar')
+        checkpoint = torch.load(r'./SA/vggsound_netvlad.pth.tar')
         Amodel.load_state_dict(checkpoint['model_state_dict'])
         Amodel = list(Amodel.audnet.children())
         self.audio_model = nn.Sequential(*Amodel[:9])

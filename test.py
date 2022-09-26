@@ -16,7 +16,7 @@ from utils.DataFromtxt import id_category
 args = get_parser()
 
 
-def test(model, Pic_path, H5_path, is_val, save_index, batch_size,
+def test(model, Pic_path, H5_path, GT_path, is_val, save_index, batch_size,
          input_size, dataset_name, Summary_Writer, test_re_dir):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = model.eval()
@@ -27,8 +27,9 @@ def test(model, Pic_path, H5_path, is_val, save_index, batch_size,
         save_path_hh = test_re_dir
 
     val_mode = "val" if is_val else "test"
-    test_loader = get_dataLoader(Pic_path=Pic_path, H5_path=H5_path, train_mode=val_mode, STA_mode=args.STA_mode,
-                                 batch_size=batch_size, input_size=input_size)  # 获取测试集
+    test_loader = get_dataLoader(Pic_path=Pic_path, H5_path=H5_path, GT_path=GT_path,
+                                 train_mode=val_mode, STA_mode=args.STA_mode,
+                                 batch_size=batch_size, input_size=input_size, crop_size=256)  # 获取测试集
     # !!
     for idx_test, dat_test in enumerate(test_loader):
         with torch.no_grad():
@@ -200,18 +201,18 @@ def load_model_weight_bef_test(test_weight_id=-1):
     # test(model=net, Pic_path=args.Pic_path, is_val=False, save_index=0, batch_size=args.batch_size,
     #      input_size=args.input_size, dataset_name=args.dataset_name, Summary_Writer=writer,
     #      test_re_dir=r'./test_result')
-
     # =============================test()====================================
-    test_result_dir = os.path.join(args.save_dir, args.STA_mode,
+    test_result_dir = os.path.join(args.save_dir, args.STA_mode, r"pic_result",
                                    r'./%s_test_result_%s/' % (args.STA_mode, test_epoch))  # 结果保存文件夹
     if not os.path.exists(test_result_dir):
         os.makedirs(test_result_dir)
     writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, r'./test_log/',
                                         r'./%s_test_result_%s/' % (args.STA_mode, test_epoch)))
-    test(model=net, Pic_path=args.Pic_path, H5_path=args.H5_path, is_val=False,
+    test(model=net, Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path, is_val=False,
          save_index=0, batch_size=args.batch_size, input_size=args.input_size,
-         dataset_name=args.dataset_name, Summary_Writer=writer, test_re_dir=test_result_dir + r"/pic_result/")
+         dataset_name=args.dataset_name, Summary_Writer=writer, test_re_dir=test_result_dir)
     writer.close()
+    # ========================================================================
 
 
 if __name__ == '__main__':
