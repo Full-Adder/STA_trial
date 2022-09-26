@@ -9,7 +9,7 @@ def MatrixNormalization(M):
     maxValue = np.max(M)
     minValue = np.min(M)
     if maxValue - minValue != 0:
-        re = (M - minValue) / (maxValue - minValue);
+        re = (M - minValue) / (maxValue - minValue)
         return re
     else:
         return M
