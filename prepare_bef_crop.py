@@ -30,7 +30,7 @@ def generate_att(STA_mode=args.STA_mode, Pic_path=args.Pic_path, H5_path=args.H5
     model.eval()
 
     train_loader = get_dataLoader(Pic_path=Pic_path, H5_path=H5_path, GT_path=None,
-                                  train_mode="all", STA_mode=STA_mode,
+                                  train_mode="att", STA_mode=STA_mode,
                                   batch_size=batch_size, input_size=input_size, crop_size=256)
 
     for idx_test, dat_test in enumerate(train_loader):
@@ -63,7 +63,7 @@ def generate_att(STA_mode=args.STA_mode, Pic_path=args.Pic_path, H5_path=args.H5
             for i in range(img1.shape[0]):  # 非0元素的个数
                 batch_index, la = ind[i]  # 帧索引，类别索引
 
-                save_accu_map_folder = os.path.join(att_dir+"_%02d" % model_train_epoch, img_name[i][:-2])
+                save_accu_map_folder = os.path.join(att_dir, img_name[i][:-2])
                 if not os.path.exists(save_accu_map_folder):
                     os.makedirs(save_accu_map_folder)
                 save_accu_map_path = os.path.join(save_accu_map_folder, img_name[i][-2:])
@@ -76,6 +76,12 @@ def generate_att(STA_mode=args.STA_mode, Pic_path=args.Pic_path, H5_path=args.H5
                 att = cv2.resize(att, (356, 356))
                 cv2.imwrite(save_accu_map_path + '_' + STA_mode + '.png', att)
 
+                heatmap = cv2.applyColorMap(att, cv2.COLORMAP_JET)
+                img = cv2.imread(os.path.join(Pic_path, img_name[i] + ".jpg"))
+                img = cv2.resize(img, (356, 356))
+                result = heatmap * 0.3 + img * 0.5
+                cv2.imwrite(save_accu_map_path + '_re_' + STA_mode + ".jpg", result)
+
                 txt_file = open(save_accu_map_path + '.txt', 'a')
                 txt_file.write('&'.join([STA_mode, img_name[i], str(index_of_pic[i].cpu().numpy()),
                                         str(probs[i].cpu().numpy()), str(class_id[i].numpy())])+'\n')
@@ -85,10 +91,29 @@ def generate_att(STA_mode=args.STA_mode, Pic_path=args.Pic_path, H5_path=args.H5
 
 
 if __name__ == "__main__":
-    generate_att(STA_mode="S", batch_size=550, model_train_epoch=30)
-    generate_att(STA_mode="ST", batch_size=170, model_train_epoch=30)
-    generate_att(STA_mode="SA", batch_size=500, model_train_epoch=30)
-
+    # =========================== val_best =============================
     # generate_att(STA_mode="S", batch_size=550, model_train_epoch=11)
-    # generate_att(STA_mode="ST", batch_size=170, model_train_epoch=12)
-    # generate_att(STA_mode="SA", batch_size=500, model_train_epoch=9)
+    # generate_att(STA_mode="ST", batch_size=170, model_train_epoch=9)
+    # generate_att(STA_mode="SA", batch_size=500, model_train_epoch=12)
+
+    # =========================== maybe best (+1) =============================
+    generate_att(STA_mode="S", batch_size=550, model_train_epoch=12, att_dir="/media/ubuntu/Data/Result/Att_valbA1")
+    generate_att(STA_mode="ST", batch_size=170, model_train_epoch=10, att_dir="/media/ubuntu/Data/Result/Att_valbA1")
+    generate_att(STA_mode="SA", batch_size=500, model_train_epoch=13, att_dir="/media/ubuntu/Data/Result/Att_valbA1")
+
+    # ========================== maybe best (+2) ============================
+    generate_att(STA_mode="S", batch_size=550, model_train_epoch=13, att_dir="/media/ubuntu/Data/Result/Att_valbA2")
+    generate_att(STA_mode="ST", batch_size=170, model_train_epoch=11, att_dir="/media/ubuntu/Data/Result/Att_valbA2")
+    generate_att(STA_mode="SA", batch_size=500, model_train_epoch=14, att_dir="/media/ubuntu/Data/Result/Att_valbA2")
+
+    # ========================== propose best (30) ============================
+    generate_att(STA_mode="S", batch_size=550, model_train_epoch=30, att_dir="/media/ubuntu/Data/Result/Att_30")
+    generate_att(STA_mode="ST", batch_size=170, model_train_epoch=30, att_dir="/media/ubuntu/Data/Result/Att_30")
+    generate_att(STA_mode="SA", batch_size=500, model_train_epoch=30, att_dir="/media/ubuntu/Data/Result/Att_30")
+
+    # ========================== true best (30) ============================
+    generate_att(STA_mode="S", batch_size=550, model_train_epoch=50, att_dir="/media/ubuntu/Data/Result/Att_50")
+    generate_att(STA_mode="ST", batch_size=170, model_train_epoch=50, att_dir="/media/ubuntu/Data/Result/Att_50")
+    generate_att(STA_mode="SA", batch_size=500, model_train_epoch=50, att_dir="/media/ubuntu/Data/Result/Att_50")
+
+    pass
