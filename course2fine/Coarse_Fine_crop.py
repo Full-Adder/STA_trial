@@ -15,7 +15,7 @@ def MatrixNormalization(M):
         return M
 
 
-if __name__ == "__main__":
+def generate_crop():
     args = get_parser()
     Data_p = args.Data_path
     att_dir = args.Att_inf_path
@@ -51,25 +51,39 @@ if __name__ == "__main__":
             F = MatrixNormalization(Up / Down)
 
             [row, col] = np.where(F > 2 * np.mean(F))
-            max_col, max_row, min_col, min_row = np.max(col), np.max(row), np.min(col), np.min(row)
+            if row.size != 0 and col.size != 0:
+                max_col, max_row, min_col, min_row = np.max(col), np.max(row), np.min(col), np.min(row)
 
-            RGB_path = os.path.join(args.pic_dir, data[0], "%02d" % id + ".jpg")
-            RGB = cv2.resize(cv2.imread(RGB_path), (356, 356))
-            result = RGB[min_row: max_row, min_col: max_col]
+                RGB_path = os.path.join(args.pic_dir, data[0], "%02d" % id + ".jpg")
+                RGB = cv2.resize(cv2.imread(RGB_path), (356, 356))
+                result = RGB[min_row: max_row, min_col: max_col]
 
-            Crop_path = os.path.join(args.Crop_path, data[0], "%02d" % id)
-            cv2.imwrite(RGB, Crop_path + "_crop.jpg")
+                Crop_path = os.path.join(args.Crop_path, data[0], "%02d" % id)
+                cv2.imwrite(result, Crop_path + "_crop.jpg")
 
-            with open(Crop_path + ".txt", "w", encoding='utf-8') as f:
-                f.writelines('&'.join(str(i) for i in [max_col, max_row, min_col, min_row]))
+                with open(Crop_path + ".txt", "w", encoding='utf-8') as f:
+                    f.writelines('&'.join(str(i) for i in [min_row, max_row, min_col, max_col]))
 
         print(data[0], "is ok!")
 
 
 def test():
+
+    # a = np.random.random([100, 999])
+    # a= MatrixNormalization(a)
+    # i, j = np.where(a > 2 * np.mean(a))
+    # print(i,j)
+
     img = cv2.imread("../Readme.assets/S_model.png")
     print(type(img), img.shape)
-    a = np.random.random([3, 4])
-    print(np.where(a > 0.5))
-    print(a)
-    print(MatrixNormalization(a))
+    img = MatrixNormalization(img)
+
+    row, col, k = np.where(img > np.mean(img))
+    print(row, col)
+    max_col, max_row, min_col, min_row = np.max(col), np.max(row), np.min(col), np.min(row)
+    print(max_col, max_row, min_col, min_row)
+
+
+if __name__ == "__main__":
+    test()
+    # generate_crop()
