@@ -109,7 +109,8 @@ def train(args):
                 loss1 = KLDLoss().to(device)
 
                 if epoch == 0 and idx == 0:
-                    writer.add_graph(model, [img_bef, img_now, img_aft])
+                    writer.add_graph(model, [img_bef, img_1, img_aft, aud_bef, aud_now, aud_aft,
+                                             switch_bef, switch_now, switch_aft])
 
                 p04, p03, p02, p14, p13, p12, p24, p23, p22 = \
                     model(img_bef, img_now, img_aft, aud_bef, aud_now, aud_aft,

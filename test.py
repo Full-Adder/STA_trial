@@ -218,7 +218,7 @@ if __name__ == '__main__':
     # args = get_parser()
     # load_model_weight_bef_test(30)
 
-    for i in range(10, 11):
+    for i in range(31, 32):
         print("now let's test weight", i)
         load_model_weight_bef_test(i)
 

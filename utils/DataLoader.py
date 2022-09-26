@@ -38,6 +38,12 @@ def get_dataLoader(Pic_path, H5_path, GT_path, train_mode, STA_mode, batch_size,
         val_loader = DataLoader(img_val, batch_size=batch_size, shuffle=False, drop_last=True)
         print("ValSet.len:", len(val_loader), "\t dataLoader.len:", len(val_loader), 'batch_size:', batch_size)
         return val_loader
+    elif train_mode == "att":
+        img_all = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, gt_dir=GT_path, STA_mode=STA_mode,
+                             mode="all", transform=tsfm_test, transforms_gt=tsfm_gt)
+        all_loader = DataLoader(img_all, batch_size=batch_size, shuffle=False, drop_last=True)
+        print("ValSet.len:", len(all_loader), "\t dataLoader.len:", len(all_loader), 'batch_size:', batch_size)
+        return all_loader
 
 
 if __name__ == "__main__":

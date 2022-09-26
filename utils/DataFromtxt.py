@@ -1,4 +1,5 @@
 import os
+from utils.args_config import get_parser
 
 txt_name = {"train": "trainSet.txt", "test": "testSet.txt", "val": "valSet.txt", "all": "Annotations.txt"}
 id_category = ['Church bell', 'Male speech, man speaking', 'Bark', 'Fixed-wing aircraft, airplane', 'Race car, auto racing', 'Female speech, woman speaking', 'Helicopter', 'Violin, fiddle', 'Flute', 'Ukulele', 'Frying (food)', 'Truck', 'Shofar', 'Motorcycle', 'Acoustic guitar', 'Train horn', 'Clock', 'Banjo', 'Goat', 'Baby cry, infant cry', 'Bus', 'Chainsaw', 'Cat', 'Horse', 'Toilet flush', 'Rodents, rats, mice', 'Accordion', 'Mandolin']
@@ -58,18 +59,19 @@ def get_category_to_key():
 
 
 if __name__ == "__main__":
-    # mydata = readDataTxt("../AVE_Dataset", "train")
-    #
-    # print(get_txtList())
-    # print(get_category_to_key())
-    #
-    # for i in range(8):
-    #     print(mydata[i])
+    args = get_parser()
+    mydata = readDataTxt(args.Data_path, "train")
+
+    print(get_txtList())
+    print(get_category_to_key())
+
+    for i in range(8):
+        print(mydata[i])
     a = list(range(0,30))
-    for name, id in category_id.items():
-        print(name,id)
-        a[id] = name
-    print(a)
+    # for name, id in category_id.items():
+    #     print(name,id)
+    #     a[id] = name
+    # print(a)
 """
 ['c---zaDCTaE', 0, 0, 10]
 ['fCZi6I6kPpU', 0, 6, 10]

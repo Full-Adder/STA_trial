@@ -29,7 +29,7 @@ class AVEDataset(Dataset):  # 数据集类
         data_folder_list = dft.readDataTxt(os.path.join(self.pic_dir, "../"), mode)
         self.data_list = []
         for idata in data_folder_list:
-            if self.STA_mode == "S" or self.STA_mode == "SA":
+            if (self.STA_mode == "S" or self.STA_mode == "SA") and mode != "all":
                 for idx in range(idata[-2], idata[-1]):
                     self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
             else:
