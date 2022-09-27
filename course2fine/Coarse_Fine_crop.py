@@ -15,7 +15,7 @@ def MatrixNormalization(M):
         return M
 
 
-def generate_crop(mode, txt_name, att_dir=None, crop_path=None):
+def generate_crop(mode, att_dir=None, crop_path=None):
     args = get_parser()
     Data_p = args.Data_path
     if att_dir is None:
@@ -44,13 +44,13 @@ def generate_crop(mode, txt_name, att_dir=None, crop_path=None):
             with open(Att_pic_txt, 'r', encoding="utf-8") as f:
                 for d in f.readlines():
                     d = d.strip().split('&')
-                    dataSet[d[0]] = [int(d[1]), float(d[2]), int(d[3])]
+                    dataSet[d[0]] = float(d[2])
 
             if len(dataSet) != 3:
                 print("ERROR in data, maybe ST")
                 break
 
-            probS, probA, probT = dataSet["S"][1], dataSet["SA"][1], dataSet["ST"][1]
+            probS, probA, probT = dataSet["S"], dataSet["SA"], dataSet["ST"]
 
             Up = V * probS + A * probA + T * probT + 0.0001
             Down = probS + probT + probA + 0.0001
@@ -94,10 +94,9 @@ def test():
 
 if __name__ == "__main__":
     # test()
-    mode = "test"
+    mode = "all"
     att = r"/media/ubuntu/Data/Result/Att_50"
     crop = r"/media/ubuntu/Data/Result/Crop_Picture_50"
-    tname = mode+"_crop_50.txt"
     generate_crop(mode, txt_name=tname, att_dir=att, crop_path=crop)
     # generate_crop("train")
     # generate_crop("val")
