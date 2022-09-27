@@ -17,8 +17,7 @@ H5_path = r"../AVE_Dataset/H5"
 
 class AVEDataset(Dataset):  # 数据集类
     def __init__(self, pic_dir, h5_dir, gt_dir, STA_mode, mode, transform, transforms_gt):
-        if mode not in dft.get_txtList().keys():
-            print("read", mode, "!")
+        assert mode in dft.get_txtList().keys(), "mode must be train/test/val/all"
         assert STA_mode in ["S", "ST", "SA", "STA"], "STA_mode must be S/SA/ST/STA"
         self.pic_dir = pic_dir
         self.h5_dir = h5_dir
@@ -30,17 +29,13 @@ class AVEDataset(Dataset):  # 数据集类
         self.class_dir = dft.get_category_to_key()
         data_folder_list = dft.readDataTxt(os.path.join(self.pic_dir, "../"), mode)
         self.data_list = []
-        if mode in dft.get_txtList().keys():
-            for idata in data_folder_list:
-                if (self.STA_mode == "S" or self.STA_mode == "SA") and mode != "all":
-                    for idx in range(idata[-2], idata[-1]):
-                        self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
-                else:
-                    for idx in range(idata[-2] + 1, idata[-1] - 1):
-                        self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
-        else:
-            for idata in data_folder_list:
-                pass
+        for idata in data_folder_list:
+            if (self.STA_mode == "S" or self.STA_mode == "SA") and mode != "all":
+                for idx in range(idata[-2], idata[-1]):
+                    self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
+            else:
+                for idx in range(idata[-2] + 1, idata[-1] - 1):
+                    self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
 
     def __len__(self):
         return len(self.data_list)
@@ -94,7 +89,8 @@ class AVEDataset(Dataset):  # 数据集类
         gt_now = self.transform_gt(Image.open(gt_now_path).convert('L'))
         gt_aft = self.transform_gt(Image.open(gt_aft_path).convert('L'))
 
-        return data[0], image_bef, aud_bef, gt_bef, image, audio, gt_now, image_aft, aud_aft, gt_aft, class_id, onehot_label
+        return data[0], image_bef, aud_bef, gt_bef, image, audio, gt_now, image_aft, aud_aft, gt_aft, \
+               class_id, onehot_label
 
 
 if __name__ == "__main__":

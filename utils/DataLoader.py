@@ -5,7 +5,7 @@ from utils.args_config import get_parser
 
 
 def get_dataLoader(Pic_path, H5_path, GT_path, train_mode, STA_mode,
-                   batch_size, input_size, crop_size, after_crop=False):
+                   batch_size, input_size, crop_size):
     mean_vals = [0.485, 0.456, 0.406]  # 数据均值
     std_vals = [0.229, 0.224, 0.225]  # 数据标准差
 

@@ -24,7 +24,6 @@ def generate_crop(mode, txt_name, att_dir=None, crop_path=None):
         crop_path = args.Crop_path
 
     data_list = readDataTxt(Data_p, mode)
-    f_txt = open(os.path.join(Data_p, txt_name), "w", encoding='utf-8')
     for data in data_list:
         for id in range(data[-2] + 1, data[-1] - 1):
             att_Pic_dir = os.path.join(att_dir, data[0], "%02d" % id)
@@ -68,17 +67,13 @@ def generate_crop(mode, txt_name, att_dir=None, crop_path=None):
                 if not os.path.exists(os.path.join(crop_path, data[0])):
                     os.makedirs(os.path.join(crop_path, data[0]))
                 Crop_path = os.path.join(crop_path, data[0], "%02d" % id)
-                cv2.imwrite(Crop_path + "_crop.jpg", result)
+                cv2.imwrite(Crop_path + ".jpg", result)
 
                 f = open(Crop_path + "_crop.txt", 'w', encoding='utf-8')
                 f.write('&'.join(str(i) for i in [min_row, max_row, min_col, max_col]))
                 f.close()
 
-                f_txt.write(os.path.join(data[0], "%02d_crop.jpg" % id)+'&'+str(dataSet["S"][2])+'\n')
-
         print(data[0], "is ok!")
-
-    f_txt.close()
 
 
 def test():

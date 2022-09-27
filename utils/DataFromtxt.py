@@ -39,26 +39,15 @@ category_id = \
 
 
 def readDataTxt(DataSet_path, mode):
-    if mode in txt_name.keys():
-        txt_path = os.path.join(DataSet_path, txt_name[mode])
-    else:
-        txt_path = os.path.join(DataSet_path, mode)
-
+    txt_path = os.path.join(DataSet_path, txt_name[mode])
     with open(txt_path, 'r', encoding="utf-8") as f:
         dataSet = []
-        if mode in txt_name.keys():
-            if mode == "all":
-                f.readline()
-            for data in f.readlines():
-                data = data.strip().split('&')
-                data_list = [data[1], category_id[data[0]], int(data[3]), int(data[4])]
-                dataSet.append(data_list)
-        else:
-            for data in f.readlines():
-                data = data.strip().split('&')
-                data = [data[0], int(data[1])]
-                dataSet.append(data)
-
+        if mode == "all":
+            f.readline()
+        for data in f.readlines():
+            data = data.strip().split('&')
+            data_list = [data[1], category_id[data[0]], int(data[3]), int(data[4])]
+            dataSet.append(data_list)
     return dataSet
 
 
