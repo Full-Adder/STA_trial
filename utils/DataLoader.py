@@ -4,7 +4,8 @@ from utils.DataSet import AVEDataset
 from utils.args_config import get_parser
 
 
-def get_dataLoader(Pic_path, H5_path, GT_path, train_mode, STA_mode, batch_size, input_size, crop_size):
+def get_dataLoader(Pic_path, H5_path, GT_path, train_mode, STA_mode,
+                   batch_size, input_size, crop_size, after_crop=False):
     mean_vals = [0.485, 0.456, 0.406]  # 数据均值
     std_vals = [0.229, 0.224, 0.225]  # 数据标准差
 
@@ -31,20 +32,20 @@ def get_dataLoader(Pic_path, H5_path, GT_path, train_mode, STA_mode, batch_size,
     elif train_mode == "test":
         img_test = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, gt_dir=GT_path,STA_mode=STA_mode,
                               mode="test", transform=tsfm_test, transforms_gt=tsfm_gt)
-        test_loader = DataLoader(img_test, batch_size=batch_size, shuffle=True, drop_last=False)
+        test_loader = DataLoader(img_test, batch_size=batch_size, shuffle=False, drop_last=False)
         print("TestSet.len:", len(img_test), "\t dataLoader.len:", len(test_loader), 'batch_size:', batch_size)
         return test_loader
     elif train_mode == "val":
         img_val = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, gt_dir=GT_path, STA_mode=STA_mode,
                              mode="val", transform=tsfm_test, transforms_gt=tsfm_gt)
-        val_loader = DataLoader(img_val, batch_size=batch_size, shuffle=False, drop_last=True)
-        print("ValSet.len:", len(val_loader), "\t dataLoader.len:", len(val_loader), 'batch_size:', batch_size)
+        val_loader = DataLoader(img_val, batch_size=batch_size, shuffle=False, drop_last=False)
+        print("ValSet.len:", len(img_val), "\t dataLoader.len:", len(val_loader), 'batch_size:', batch_size)
         return val_loader
     elif train_mode == "att":
         img_all = AVEDataset(pic_dir=Pic_path, h5_dir=H5_path, gt_dir=GT_path, STA_mode=STA_mode,
                              mode="all", transform=tsfm_test, transforms_gt=tsfm_gt)
-        all_loader = DataLoader(img_all, batch_size=batch_size, shuffle=False, drop_last=True)
-        print("ValSet.len:", len(all_loader), "\t dataLoader.len:", len(all_loader), 'batch_size:', batch_size)
+        all_loader = DataLoader(img_all, batch_size=batch_size, shuffle=False, drop_last=False)
+        print("AttSet.len:", len(img_all), "\t dataLoader.len:", len(all_loader), 'batch_size:', batch_size)
         return all_loader
 
 

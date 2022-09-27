@@ -13,8 +13,8 @@ def get_parser():
     # parser.add_argument("--Pic_path", type=str, default=r"/home/ubuntu/AVE_Dataset/Crop_Picture")    # after_crop
     parser.add_argument("--H5_path", type=str, default=r"/home/ubuntu/AVE_Dataset/H5")
     parser.add_argument("--Att_re_path", type=str, default=r"/media/ubuntu/Data/Result/Att")
-    parser.add_argument("--Att_inf_path", type=str, default=r"/media/ubuntu/Data/Result/Att_30")
-    parser.add_argument("--Crop_path", type=str, default=r"/home/ubuntu/AVE_Dataset/Crop_Picture")
+    parser.add_argument("--Att_inf_path", type=str, default=r"/media/ubuntu/Data/Result/Att_50")
+    parser.add_argument("--Crop_path", type=str, default=r"/home/ubuntu/AVE_Dataset/Crop_Picture_50")
     parser.add_argument("--GT_path", type=str, default=r"/home/ubuntu/AVE_Dataset/GT")
     parser.add_argument("--save_dir", type=str, default=r'/media/ubuntu/Data/Result/')
     # ------------------------------win--------------------------------------------
