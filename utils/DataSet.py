@@ -100,7 +100,7 @@ class AVEDataset(Dataset):  # 数据集类
 
 if __name__ == "__main__":
     args = get_parser()
-    x = AVEDataset(pic_dir=args.Pic_path, h5_dir=args.H5_path, gt_dir=args.GT_path,
+    x = AVEDataset(pic_dir=args.Pic_path, h5_dir=args.H5_path, gt_dir=args.GT_path, ST_cut=0,
                    mode="train", transform=transforms.ToTensor(), transforms_gt=None, STA_mode="S")
     print(len(x))
     for i in x:
