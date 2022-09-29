@@ -16,10 +16,9 @@ H5_path = r"../AVE_Dataset/H5"
 
 
 class AVEDataset(Dataset):  # 数据集类
-    def __init__(self, pic_dir, h5_dir, gt_dir, STA_mode, mode, ST_cut, transform, transforms_gt):
+    def __init__(self, pic_dir, h5_dir, gt_dir, STA_mode, mode, transform, transforms_gt):
         assert mode in dft.get_txtList().keys(), "mode must be train/test/val/all"
         assert STA_mode in ["S", "ST", "SA", "STA"], "STA_mode must be S/SA/ST/STA"
-        assert ST_cut >= 0, "ST_cut must be bigger then 0"
         self.pic_dir = pic_dir
         self.h5_dir = h5_dir
         self.gt_dir = gt_dir
@@ -30,17 +29,12 @@ class AVEDataset(Dataset):  # 数据集类
         self.class_dir = dft.get_category_to_key()
         data_folder_list = dft.readDataTxt(os.path.join(self.pic_dir, "../"), mode)
         self.data_list = []
+        cut = 1
+        if STA_mode=="ST":
+            cut = 2
         for idata in data_folder_list:
-            if ST_cut == 0:
-                if self.STA_mode == "S" or self.STA_mode == "SA":
-                    for idx in range(idata[-2], idata[-1]):
-                        self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
-                else:
-                    for idx in range(idata[-2] + 1, idata[-1] - 1):
-                        self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
-            else:
-                for idx in range(idata[-2] + ST_cut, idata[-1] - ST_cut):
-                    self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
+            for idx in range(idata[-2] + cut, idata[-1] - cut):
+                self.data_list.append([os.path.join(idata[0], "{:0>2d}".format(idx)), idata[1]])
 
     def __len__(self):
         return len(self.data_list)

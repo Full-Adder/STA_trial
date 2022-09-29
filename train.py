@@ -16,9 +16,17 @@ def train(args):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     losses = AverageMeter()
 
+    # ======================================== course stage =============================
+    # train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path,
+    #                               train_mode="train", STA_mode=args.STA_mode, batch_size=args.batch_size,
+    #                               input_size=args.input_size, crop_size=args.crop_size)
+
+    # ========================================= fine stage=============================+
     train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path,
                                   train_mode="train", STA_mode=args.STA_mode, batch_size=args.batch_size,
-                                  input_size=args.input_size, crop_size=args.crop_size)
+                                  input_size=356, crop_size=356, after_crop=True)
+
+
     model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
 
     save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')  # 权重保存地点
@@ -27,7 +35,7 @@ def train(args):
         print("-----> find pretrained model weight in", best_pth)
         state = torch.load(best_pth)
         total_epoch = state['epoch'] + 1
-        print("-----> has trained", total_epoch + 1, 'in', best_pth)
+        print("-----> has trained", total_epoch, 'in', best_pth)
         if total_epoch >= args.epoch:
             print("-----> your arg.epoch:", args.epoch)
             return
@@ -87,11 +95,11 @@ def train(args):
                              + 0.6 * (F.cross_entropy(x1, class_id) + F.cross_entropy(x2, class_id)
                                       + F.cross_entropy(x3, class_id))
             else:
-                img_name, img_bef, aud_bef, gt_bef, img_1, aud_now, gt_now, \
+                img_name, img_bef, aud_bef, gt_bef, img1, aud_now, gt_now, \
                 img_aft, aud_aft, gt_aft, class_id, onehot_label = dat
 
                 img_bef = img_bef.to(device)
-                img_1 = img_1.to(device)
+                img1 = img1.to(device)
                 img_aft = img_aft.to(device)
                 aud_bef = aud_aft.to(device)
                 aud_now = aud_now.to(device)
@@ -103,7 +111,7 @@ def train(args):
                 audiocls.cuda().eval()
                 with torch.no_grad():
                     switch_bef = audiocls(aud_bef, img_bef)
-                    switch_now = audiocls(aud_now, img_1)
+                    switch_now = audiocls(aud_now, img1)
                     switch_aft = audiocls(aud_aft, img_aft)
                 switch_bef = switch_bef.to(device)
                 switch_now = switch_now.to(device)
@@ -112,11 +120,11 @@ def train(args):
                 loss1 = KLDLoss().to(device)
 
                 if epoch == 0 and idx == 0:
-                    writer.add_graph(model, [img_bef, img_1, img_aft, aud_bef, aud_now, aud_aft,
+                    writer.add_graph(model, [img_bef, img1, img_aft, aud_bef, aud_now, aud_aft,
                                              switch_bef, switch_now, switch_aft])
 
                 p04, p03, p02, p14, p13, p12, p24, p23, p22 = \
-                    model(img_bef, img_1, img_aft, aud_bef, aud_now, aud_aft,
+                    model(img_bef, img1, img_aft, aud_bef, aud_now, aud_aft,
                           switch_bef, switch_now, switch_aft)
 
                 loss_train = loss2(p04, gt_bef) + loss2(p14, gt_now) + loss2(p24, gt_aft) + \
@@ -146,8 +154,8 @@ def train(args):
 
         if (epoch + 1) % args.val_Pepoch == 0:
             print("------------------------------val:start-----------------------------")
-            test(model, args.Pic_path, args.H5_path, args.GT_path, True, epoch, args.batch_size,
-                 args.input_size, args.dataset_name, writer, val_re_save_path)
+            test(model, args.STA_mode, args.Pic_path, args.H5_path, args.GT_path, True, epoch, args.batch_size,
+                 args.input_size, args.crop_size, args.dataset_name, writer, val_re_save_path)
             print("------------------------------ val:end -----------------------------")
 
         if not os.path.exists(save_weight_fold):
@@ -164,7 +172,8 @@ def train(args):
                 'epoch': epoch,  # 当前轮数
                 'state_dict': model.state_dict(),  # 模型参数
                 'optimizer': optimizer.state_dict()  # 优化器参数
-            }, filename=os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode)))
+            }, filename=os.path.join(save_weight_fold, '%s_%s_crop_model_best.pth.tar' % (args.dataset_name, args.STA_mode)))
+            # }, filename=os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode)))
 
     writer.close()
 

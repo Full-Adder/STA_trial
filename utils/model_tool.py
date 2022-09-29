@@ -33,8 +33,6 @@ def get_model(STA_mode, lr=0.00005, weight_decay=0.0005):  # 获取 model
 
 
 def save_checkpoint(state, filename):
-    if not os.path.exists(filename):
-        os.makedirs(filename)
     torch.save(state, filename)
     print("Congratulations! Your train code has been processed!")
     print("And your --epoch  --modul_weight  -- optim_weigh has been saved in ", filename)

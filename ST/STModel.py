@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
+import math
 from utils.ConvGRU import ConvGRUCell
 
 model_urls = {'resnext101_32x8d': 'https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth',
@@ -71,9 +72,11 @@ class STNetModel(nn.Module):
         x3ss = F.avg_pool2d(x3, kernel_size=(x3.size(2), x3.size(3)), padding=0)
         x3ss = x3ss.view(-1, 28)  # 2,28
 
-        incat1 = torch.cat((x2.unsqueeze(1), x1.unsqueeze(1), x3.unsqueeze(1)), 1).view(batch_num, 28, 3, 8, 8)
-        incat2 = torch.cat((x1.unsqueeze(1), x2.unsqueeze(1), x3.unsqueeze(1)), 1).view(batch_num, 28, 3, 8, 8)
-        incat3 = torch.cat((x1.unsqueeze(1), x3.unsqueeze(1), x2.unsqueeze(1)), 1).view(batch_num, 28, 3, 8, 8)
+        incat1 = torch.cat((x2.unsqueeze(1), x1.unsqueeze(1), x3.unsqueeze(1)), 1)
+        s = int(math.sqrt(incat1.numel()//batch_num//28//3))
+        incat1 = incat1.view(batch_num, 28, 3, s, s)
+        incat2 = torch.cat((x1.unsqueeze(1), x2.unsqueeze(1), x3.unsqueeze(1)), 1).view(batch_num, 28, 3, s, s)
+        incat3 = torch.cat((x1.unsqueeze(1), x3.unsqueeze(1), x2.unsqueeze(1)), 1).view(batch_num, 28, 3, s, s)
 
         x11 = self.extra_conv_fusion(torch.cat((F.relu(x1 + self.self_attention(x1)),
                                                 F.relu(x1 + x1 * self.extra_s(

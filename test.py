@@ -16,8 +16,8 @@ from utils.DataFromtxt import id_category
 args = get_parser()
 
 
-def test(model, Pic_path, H5_path, GT_path, is_val, save_index, batch_size,
-         input_size, dataset_name, Summary_Writer, test_re_dir):
+def test(model, STA_mode, Pic_path, H5_path, GT_path, is_val, save_index, batch_size,
+         input_size, crop_size, dataset_name, Summary_Writer, test_re_dir):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = model.eval()
 
@@ -28,12 +28,12 @@ def test(model, Pic_path, H5_path, GT_path, is_val, save_index, batch_size,
 
     val_mode = "val" if is_val else "test"
     test_loader = get_dataLoader(Pic_path=Pic_path, H5_path=H5_path, GT_path=GT_path,
-                                 train_mode=val_mode, STA_mode=args.STA_mode,
-                                 batch_size=batch_size, input_size=input_size, crop_size=256)  # 获取测试集
+                                 train_mode=val_mode, STA_mode=STA_mode,
+                                 batch_size=batch_size, input_size=input_size, crop_size=crop_size)  # 获取测试集
     # !!
     for idx_test, dat_test in enumerate(test_loader):
         with torch.no_grad():
-            if args.STA_mode == "S":
+            if STA_mode == "S":
                 img_name, img1, class_id, onehot_label = dat_test
                 img1 = img1.to(device)
                 class_id = class_id.to(device)
@@ -41,7 +41,7 @@ def test(model, Pic_path, H5_path, GT_path, is_val, save_index, batch_size,
                 x11, x22, map1, map2 = model(img1)
                 loss_t = F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
 
-            elif args.STA_mode == "SA":
+            elif STA_mode == "SA":
                 img_name, img1, aud1, class_id, onehot_label = dat_test
                 img1 = img1.to(device)
                 aud1 = aud1.to(device)
@@ -50,7 +50,7 @@ def test(model, Pic_path, H5_path, GT_path, is_val, save_index, batch_size,
                 x11, x22, map1, map2 = model(img1, aud1)
                 loss_t = F.cross_entropy(x11, class_id) + F.cross_entropy(x22, class_id)
 
-            elif args.STA_mode == "ST":
+            elif STA_mode == "ST":
                 img_name, img_bef, img_now, img_aft, class_id, onehot_label = dat_test
 
                 img_bef = img_bef.to(device)
@@ -104,7 +104,7 @@ def test(model, Pic_path, H5_path, GT_path, is_val, save_index, batch_size,
             Summary_Writer.add_scalars(dataset_name, {"val_loss": loss_t.data.item()},
                                        (save_index * len(test_loader) + idx_test) * 8)
         else:
-            Summary_Writer.add_scalar(dataset_name + "_" + args.STA_mode + "_test_loss", loss_t.data.item(),
+            Summary_Writer.add_scalar(dataset_name + "_" + STA_mode + "_test_loss", loss_t.data.item(),
                                       save_index * len(test_loader) + idx_test)
 
         dt = datetime.now().strftime("%y-%m-%d %H:%M:%S")
@@ -138,11 +138,11 @@ def test(model, Pic_path, H5_path, GT_path, is_val, save_index, batch_size,
                 att = atts[la].cpu().data.numpy()  # 转为numpy数组
                 att = np.rint(att / (att.max() + 1e-8) * 255)  # 归一化到0-255
                 att = np.array(att, np.uint8)
-                att = cv2.resize(att, (220, 220))  # 修改分辨率
+                att = cv2.resize(att, (356, 356))  # 修改分辨率
 
                 heatmap = cv2.applyColorMap(att, cv2.COLORMAP_JET)
                 img = cv2.imread(os.path.join(Pic_path, img_name[i] + ".jpg"))
-                img = cv2.resize(img, (220, 220))
+                img = cv2.resize(img, (356, 356))
                 result = heatmap * 0.3 + img * 0.5
                 if (not is_val) or args.need_val_repic_save:
                     cv2.imwrite(save_accu_map_path + '.png', att)  # 保存图片
@@ -160,10 +160,10 @@ def test(model, Pic_path, H5_path, GT_path, is_val, save_index, batch_size,
                                       save_index, dataformats="NHWC")
 
 
-def load_model_weight_bef_test(test_weight_id=-1):
+def load_model_weight_bef_test(test_weight_id=-1, STA_mode="S", fname=r'test_result'):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    net, _ = get_model(args.STA_mode)
-    save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')
+    net, _ = get_model(STA_mode)
+    save_weight_fold = os.path.join(args.save_dir, STA_mode, './model_weight/')
 
     if test_weight_id == -1:
         test_epoch = input(r"please input your test weight of your mode! Maybe is 10/20/.../best: ")
@@ -171,7 +171,7 @@ def load_model_weight_bef_test(test_weight_id=-1):
         test_epoch = str(test_weight_id)
 
     if test_epoch == "best":
-        best_pth = os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
+        best_pth = os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, STA_mode))
         if os.path.exists(best_pth):
             print("-----> find pretrained model weight in", best_pth)
             state = torch.load(best_pth)
@@ -183,7 +183,7 @@ def load_model_weight_bef_test(test_weight_id=-1):
 
     else:
         num = int(test_epoch)
-        best_pth = os.path.join(save_weight_fold, "%s_%s_%03d" % (args.dataset_name, args.STA_mode, num) + '.pth')
+        best_pth = os.path.join(save_weight_fold, "%s_%s_%03d" % (args.dataset_name, STA_mode, num) + '.pth')
         if os.path.exists(best_pth):
             print("-----> find pretrained model weight in", best_pth)
             state = torch.load(best_pth)
@@ -202,14 +202,14 @@ def load_model_weight_bef_test(test_weight_id=-1):
     #      input_size=args.input_size, dataset_name=args.dataset_name, Summary_Writer=writer,
     #      test_re_dir=r'./test_result')
     # =============================test()====================================
-    test_result_dir = os.path.join(args.save_dir, args.STA_mode, r"pic_result",
-                                   r'./%s_test_result_%s/' % (args.STA_mode, test_epoch))  # 结果保存文件夹
+    test_result_dir = os.path.join(args.save_dir, STA_mode, r"pic_result",
+                                   r'./%s_%s_%s/' % (STA_mode, fname, test_epoch))  # 结果保存文件夹
     if not os.path.exists(test_result_dir):
         os.makedirs(test_result_dir)
-    writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, r'./test_log/',
-                                        r'./%s_test_result_%s/' % (args.STA_mode, test_epoch)))
-    test(model=net, Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path, is_val=False,
-         save_index=0, batch_size=args.batch_size, input_size=args.input_size,
+    writer = SummaryWriter(os.path.join(args.save_dir, STA_mode, r'./test_log/',
+                                        r'./%s_%s_%s/' % (STA_mode, fname, test_epoch)))
+    test(model=net, STA_mode=STA_mode, Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path, is_val=False,
+         save_index=0, batch_size=args.batch_size, input_size=args.input_size, crop_size=args.crop_size,
          dataset_name=args.dataset_name, Summary_Writer=writer, test_re_dir=test_result_dir)
     writer.close()
     # ========================================================================
@@ -217,10 +217,10 @@ def load_model_weight_bef_test(test_weight_id=-1):
 
 if __name__ == '__main__':
     # args = get_parser()
-    # load_model_weight_bef_test(30)
+    load_model_weight_bef_test(test_weight_id=50, STA_mode="S")
 
-    for i in range(31, 32):
-        print("now let's test weight", i)
-        load_model_weight_bef_test(i)
+    # for i in range(31, 32):
+    #     print("now let's test weight", i)
+    #     load_model_weight_bef_test(i)
 
 #  tensorboard.exe --logdir ./ --samples_per_plugin images=100
