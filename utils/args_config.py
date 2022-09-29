@@ -17,6 +17,7 @@ def get_parser():
     parser.add_argument("--Crop_path", type=str, default=r"/home/ubuntu/AVE_Dataset/Crop_Picture_50")
     parser.add_argument("--GT_path", type=str, default=r"/home/ubuntu/AVE_Dataset/GT")
     parser.add_argument("--save_dir", type=str, default=r'/media/ubuntu/Data/Result/')
+    parser.add_argument("--SCAM_path", type=str, default=r'/media/ubuntu/Data/Result/SCAM')
     # ------------------------------win--------------------------------------------
     # parser.add_argument("--Data_path", type=str, default=r"D:\WorkPlace\Python\my_STA\AVE_Dataset")
     # parser.add_argument("--Video_path", type=str, default=r"D:\WorkPlace\Python\my_STA\AVE_Dataset\Video")

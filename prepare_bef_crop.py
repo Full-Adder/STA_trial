@@ -83,42 +83,43 @@ def generate_att(STA_mode=args.STA_mode, Pic_path=args.Pic_path, H5_path=args.H5
                 cv2.imwrite(save_accu_map_path + '_re_' + STA_mode + ".jpg", result)
 
                 txt_file = open(save_accu_map_path + '.txt', 'a')
-                txt_file.write('&'.join([STA_mode, img_name[i], str(index_of_pic[i].cpu().numpy()),
-                                        str(probs[i].cpu().numpy()), str(class_id[i].numpy())])+'\n')
-                # 图片名称 预测标签 预测概率 标签
+                txt_file.write('&'.join([STA_mode, img_name[i],
+                                         str(index_of_pic[i].cpu().numpy()), str(probs[i].cpu().numpy()),
+                                         str(class_id[i].numpy()), str(h_x[i][class_id[i]].cpu().numpy())])+'\n')
+                # STA_mode 图片名称 预测概率最高的标签 概率 真实标签 预测的真实标签概率
                 txt_file.close()
-                print("has save", save_accu_map_path)
+                print(STA_mode, "has save", save_accu_map_path)
 
 
 if __name__ == "__main__":
     # =========================== val_best =============================
-    att = r"/media/ubuntu/Data/Result/Att_valbest"
-    generate_att(STA_mode="S", batch_size=550, model_train_epoch=11, att_dir=att)
-    generate_att(STA_mode="ST", batch_size=170, model_train_epoch=9, att_dir=att)
-    generate_att(STA_mode="SA", batch_size=500, model_train_epoch=12, att_dir=att)
-
-    # =========================== maybe best (+1) =============================
-    att = r"/media/ubuntu/Data/Result/Att_valbA1"
-    generate_att(STA_mode="S", batch_size=550, model_train_epoch=12, att_dir=att)
-    generate_att(STA_mode="ST", batch_size=170, model_train_epoch=10, att_dir=att)
-    generate_att(STA_mode="SA", batch_size=500, model_train_epoch=13, att_dir=att)
-
-    # ========================== maybe best (+2) ============================
+    # att = r"/media/ubuntu/Data/Result/Att_valbest"
+    # generate_att(STA_mode="S", batch_size=550, model_train_epoch=11, att_dir=att)
+    # generate_att(STA_mode="ST", batch_size=170, model_train_epoch=9, att_dir=att)
+    # generate_att(STA_mode="SA", batch_size=500, model_train_epoch=12, att_dir=att)
+    #
+    # # =========================== maybe best (+1) =============================
+    # att = r"/media/ubuntu/Data/Result/Att_valbA1"
+    # generate_att(STA_mode="S", batch_size=550, model_train_epoch=12, att_dir=att)
+    # generate_att(STA_mode="ST", batch_size=170, model_train_epoch=10, att_dir=att)
+    # generate_att(STA_mode="SA", batch_size=500, model_train_epoch=13, att_dir=att)
+    #
+    # # ========================== maybe best (+2) ============================
     att = r"/media/ubuntu/Data/Result/Att_valbA2"
     generate_att(STA_mode="S", batch_size=550, model_train_epoch=13, att_dir=att)
     generate_att(STA_mode="ST", batch_size=170, model_train_epoch=11, att_dir=att)
     generate_att(STA_mode="SA", batch_size=500, model_train_epoch=14, att_dir=att)
-
-    # ========================== propose best (30) ============================
-    att = r"/media/ubuntu/Data/Result/Att_30"
-    generate_att(STA_mode="S", batch_size=550, model_train_epoch=30, att_dir=att)
-    generate_att(STA_mode="ST", batch_size=170, model_train_epoch=30, att_dir=att)
-    generate_att(STA_mode="SA", batch_size=500, model_train_epoch=30, att_dir=att)
-
-    # ========================== true best (30) ============================
-    att = r"/media/ubuntu/Data/Result/Att_50"
-    generate_att(STA_mode="S", batch_size=550, model_train_epoch=50, att_dir=att)
-    generate_att(STA_mode="ST", batch_size=170, model_train_epoch=50, att_dir=att)
-    generate_att(STA_mode="SA", batch_size=500, model_train_epoch=50, att_dir=att)
+    #
+    # # ========================== propose best (30) ============================
+    # att = r"/media/ubuntu/Data/Result/Att_30"
+    # generate_att(STA_mode="S", batch_size=550, model_train_epoch=30, att_dir=att)
+    # generate_att(STA_mode="ST", batch_size=170, model_train_epoch=30, att_dir=att)
+    # generate_att(STA_mode="SA", batch_size=500, model_train_epoch=30, att_dir=att)
+    #
+    # # ========================== true best (30) ============================
+    # att = r"/media/ubuntu/Data/Result/Att_50"
+    # generate_att(STA_mode="S", batch_size=550, model_train_epoch=50, att_dir=att)
+    # generate_att(STA_mode="ST", batch_size=170, model_train_epoch=50, att_dir=att)
+    # generate_att(STA_mode="SA", batch_size=500, model_train_epoch=50, att_dir=att)
 
     pass
