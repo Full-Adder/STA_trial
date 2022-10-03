@@ -17,8 +17,9 @@ class SANetModel(nn.Module):
         self.audio_model = nn.Sequential(*Amodel[:9])
         self.extra_audio_d = nn.Linear(8192, 2048)
         self.Aup = nn.Sequential(nn.ConvTranspose2d(2048, 2048, kernel_size=3, stride=1, padding=0), nn.ReLU(True),
-                                 nn.ConvTranspose2d(2048, 2048, kernel_size=3, stride=1, padding=0), nn.ReLU(True),
-                                 nn.ConvTranspose2d(2048, 2048, kernel_size=4, stride=1, padding=0))
+                                 nn.ConvTranspose2d(2048, 2048, kernel_size=4, stride=1, padding=0), nn.ReLU(True),
+                                 nn.ConvTranspose2d(2048, 2048, kernel_size=5, stride=1, padding=0))
+        # if in course stage kernel_size = [3,3,4], while in fine stage k_size = [3,4,5]
 
 
         # net = torch.hub.load('facebookresearch/WSL-Images', 'resnext101_32x8d_wsl')
