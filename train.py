@@ -30,7 +30,8 @@ def train(args):
     model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
 
     save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')  # 权重保存地点
-    best_pth = os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
+    best_pth = os.path.join(save_weight_fold, '%s_%s_crop_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
+    # best_pth = os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
     if os.path.exists(best_pth):
         print("-----> find pretrained model weight in", best_pth)
         state = torch.load(best_pth)
@@ -44,6 +45,7 @@ def train(args):
         print("-----> success load pretrained weight form ", best_pth)
         print("-----> continue to train!")
     else:
+        print("mo weight in", best_pth)
         total_epoch = 0
 
     writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, './train_log/'))  # tensorboard保存地点

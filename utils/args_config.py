@@ -38,7 +38,7 @@ def get_parser():
     parser.add_argument("--batch_size", type=int, default=32) # train 3090:S-64 SA-40 ST-20 test:2060:S-128 SA:50 ST:64
     parser.add_argument("--lr", type=float, default=0.00005)
     parser.add_argument("--decay_points", type=str, default='5,10')  # 衰变点
-    parser.add_argument("--epoch", type=int, default=40)
+    parser.add_argument("--epoch", type=int, default=60)
     parser.add_argument("--global_counter", type=int, default=0)
     parser.add_argument("--disp_interval", type=int, default=10)
 
