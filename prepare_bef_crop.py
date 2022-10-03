@@ -31,7 +31,7 @@ def generate_att(STA_mode=args.STA_mode, Pic_path=args.Pic_path, H5_path=args.H5
 
     train_loader = get_dataLoader(Pic_path=Pic_path, H5_path=H5_path, GT_path=None,
                                   train_mode="att", STA_mode=STA_mode,
-                                  batch_size=batch_size, input_size=input_size, crop_size=256, ST_cut=1)
+                                  batch_size=batch_size, input_size=input_size, crop_size=356)
 
     for idx_test, dat_test in enumerate(train_loader):
         with torch.no_grad():
