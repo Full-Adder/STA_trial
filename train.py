@@ -10,28 +10,18 @@ from datetime import datetime
 from utils.model_tool import get_model, save_checkpoint
 from test import test
 from torch.utils.tensorboard import SummaryWriter
+import utils.myoptim as my_optim
 
 
 def train(args):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     losses = AverageMeter()
 
-    # ======================================== course stage =============================
-    # train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path,
-    #                               train_mode="train", STA_mode=args.STA_mode, batch_size=args.batch_size,
-    #                               input_size=args.input_size, crop_size=args.crop_size)
-
-    # ========================================= fine stage=============================+
-    train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path,
-                                  train_mode="train", STA_mode=args.STA_mode, batch_size=args.batch_size,
-                                  input_size=356, crop_size=356, after_crop=True)
-
-
     model, optimizer = get_model(args.STA_mode, args.lr, args.weight_decay)
 
     save_weight_fold = os.path.join(args.save_dir, args.STA_mode, './model_weight/')  # 权重保存地点
-    best_pth = os.path.join(save_weight_fold, '%s_%s_crop_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
-    # best_pth = os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
+    # best_pth = os.path.join(save_weight_fold, '%s_%s_crop_model_best.pth.tar' % (args.dataset_name, args.STA_mode))
+    best_pth = os.path.join(save_weight_fold, '%s_%s_%d_model_best.pth.tar' % (args.dataset_name, args.STA_mode, 30))
     if os.path.exists(best_pth):
         print("-----> find pretrained model weight in", best_pth)
         state = torch.load(best_pth)
@@ -45,7 +35,7 @@ def train(args):
         print("-----> success load pretrained weight form ", best_pth)
         print("-----> continue to train!")
     else:
-        print("mo weight in", best_pth)
+        print("no weight in", best_pth)
         total_epoch = 0
 
     writer = SummaryWriter(os.path.join(args.save_dir, args.STA_mode, './train_log/'))  # tensorboard保存地点
@@ -54,6 +44,18 @@ def train(args):
     for epoch in range(total_epoch, args.epoch):
         model.train()
         losses.reset()
+        my_optim.reduce_lr(args, optimizer, epoch+1)
+
+        # ======================================== course stage =============================
+        # train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path,
+        #                               train_mode="train", STA_mode=args.STA_mode, batch_size=args.batch_size,
+        #                               input_size=args.input_size, crop_size=args.crop_size)
+
+        # ========================================= fine stage=============================+
+        train_loader = get_dataLoader(Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path,
+                                      train_mode="train", STA_mode=args.STA_mode, batch_size=args.batch_size,
+                                      input_size=args.input_size)
+
 
         for idx, dat in enumerate(train_loader):  # 从train_loader中获取数据
 
@@ -143,39 +145,40 @@ def train(args):
             optimizer.step()
 
             losses.update(loss_train.data.item(), img1.size()[0])
-            writer.add_scalars(args.dataset_name, {"train_loss": losses.val}, epoch * len(train_loader) + idx)
+            writer.add_scalars(args.dataset_name + "_" + args.STA_mode, {"train_loss": losses.val}, epoch * len(train_loader) + idx)
 
             if (idx + 1) % args.disp_interval == 0:
                 dt = datetime.now().strftime("%y-%m-%d %H:%M:%S")
                 print('time:{}\t'
-                      'Epoch: [{:2d}][{:4d}/{:4d}]\t'
-                      'LR: {:.5f}\t'
+                      'Epoch: [{:2d}/{:2d}][{:4d}/{:4d}]\t'
+                      'LR: {:.8f}\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'.
-                      format(dt, epoch + 1, (idx + 1), len(train_loader),
+                      format(dt, epoch + 1, args.epoch, (idx + 1), len(train_loader),
                              optimizer.param_groups[0]['lr'], loss=losses))
 
         if (epoch + 1) % args.val_Pepoch == 0:
             print("------------------------------val:start-----------------------------")
             test(model, args.STA_mode, args.Pic_path, args.H5_path, args.GT_path, True, epoch, args.batch_size,
-                 args.input_size, args.crop_size, args.dataset_name, writer, val_re_save_path)
+                 args.input_size, args.dataset_name, writer, val_re_save_path)
             print("------------------------------ val:end -----------------------------")
 
         if not os.path.exists(save_weight_fold):
             os.makedirs(save_weight_fold)
         save_path = os.path.join(save_weight_fold,
-                                 "%s_%s_%03d" % (args.dataset_name, args.STA_mode, epoch + 1) + '.pth')
+                                 "%s_%s_%03d.pth" % (args.dataset_name, args.STA_mode, (epoch + 1)))
         torch.save(model.state_dict(), save_path)  # 保存现在的权重
         print("weight has been saved in ", save_path)
 
         model.train()
 
-        if (epoch + 1) == args.epoch:
+        if (epoch + 1) % 10 == 0:
             save_checkpoint({
                 'epoch': epoch,  # 当前轮数
                 'state_dict': model.state_dict(),  # 模型参数
                 'optimizer': optimizer.state_dict()  # 优化器参数
-            }, filename=os.path.join(save_weight_fold, '%s_%s_crop_model_best.pth.tar' % (args.dataset_name, args.STA_mode)))
-            # }, filename=os.path.join(save_weight_fold, '%s_%s_model_best.pth.tar' % (args.dataset_name, args.STA_mode)))
+            }, filename=os.path.join(save_weight_fold,
+                                     '%s_%s_%02d_model_best.pth.tar'
+                                     % (args.dataset_name, args.STA_mode, (epoch+1))))
 
     writer.close()
 

@@ -17,7 +17,7 @@ args = get_parser()
 
 
 def test(model, STA_mode, Pic_path, H5_path, GT_path, is_val, save_index, batch_size,
-         input_size, crop_size, dataset_name, Summary_Writer, test_re_dir):
+         input_size, dataset_name, Summary_Writer, test_re_dir):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = model.eval()
 
@@ -28,8 +28,8 @@ def test(model, STA_mode, Pic_path, H5_path, GT_path, is_val, save_index, batch_
 
     val_mode = "val" if is_val else "test"
     test_loader = get_dataLoader(Pic_path=Pic_path, H5_path=H5_path, GT_path=GT_path,
-                                 train_mode=val_mode, STA_mode=STA_mode,
-                                 batch_size=batch_size, input_size=input_size, crop_size=crop_size)  # 获取测试集
+                                 train_mode="test", STA_mode=STA_mode,
+                                 batch_size=batch_size, input_size=input_size)  # 获取测试集
     # !!
     for idx_test, dat_test in enumerate(test_loader):
         with torch.no_grad():
@@ -101,17 +101,16 @@ def test(model, STA_mode, Pic_path, H5_path, GT_path, is_val, save_index, batch_
 
         result_show_list = []
         if is_val:
-            Summary_Writer.add_scalars(dataset_name, {"val_loss": loss_t.data.item()},
-                                       (save_index * len(test_loader) + idx_test) * 8)
+            Summary_Writer.add_scalars(dataset_name + "_" + STA_mode, {"val_loss": loss_t.data.item()},
+                                       (save_index * len(test_loader) + idx_test) * 46)
         else:
             Summary_Writer.add_scalar(dataset_name + "_" + STA_mode + "_test_loss", loss_t.data.item(),
                                       save_index * len(test_loader) + idx_test)
 
         dt = datetime.now().strftime("%y-%m-%d %H:%M:%S")
-        if idx_test % args.disp_interval == 0:
-            print('time:{}\t'
-                  'Batch: [{:4d}/{:4d}]\t'
-                  'Loss {:.4f})\t'.format(dt, idx_test, len(test_loader), loss_t.data.item()))
+        print('time:{}\t'
+              'Batch: [{:4d}/{:4d}]\t'
+              'Loss {:.4f})\t'.format(dt, idx_test, len(test_loader), loss_t.data.item()))
 
         if not is_val or args.need_val_repic_save or (idx_test % (len(test_loader) // 4) == 0):
             # is_test or you need to save all val_repic

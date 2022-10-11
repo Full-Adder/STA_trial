@@ -2,11 +2,14 @@ import os
 from utils.args_config import get_parser
 
 txt_name = {"train": "trainSet.txt",
-            "test": "testSet.txt",
-            "val": "valSet.txt",
-            "all": "Annotations.txt",
-            }
-id_category = ['Church bell', 'Male speech, man speaking', 'Bark', 'Fixed-wing aircraft, airplane', 'Race car, auto racing', 'Female speech, woman speaking', 'Helicopter', 'Violin, fiddle', 'Flute', 'Ukulele', 'Frying (food)', 'Truck', 'Shofar', 'Motorcycle', 'Acoustic guitar', 'Train horn', 'Clock', 'Banjo', 'Goat', 'Baby cry, infant cry', 'Bus', 'Chainsaw', 'Cat', 'Horse', 'Toilet flush', 'Rodents, rats, mice', 'Accordion', 'Mandolin']
+            "test": "testSet.txt"}
+
+id_category = ['Church bell', 'Male speech, man speaking', 'Bark', 'Fixed-wing aircraft, airplane',
+               'Race car, auto racing', 'Female speech, woman speaking', 'Helicopter', 'Violin, fiddle',
+               'Flute', 'Ukulele', 'Frying (food)', 'Truck', 'Shofar', 'Motorcycle', 'Acoustic guitar',
+               'Train horn', 'Clock', 'Banjo', 'Goat', 'Baby cry, infant cry', 'Bus', 'Chainsaw', 'Cat',
+               'Horse', 'Toilet flush', 'Rodents, rats, mice', 'Accordion', 'Mandolin']
+
 category_id = \
     {'Church bell': 0,                      # 教堂的钟
      'Male speech, man speaking': 1,        # 男人说话
@@ -42,8 +45,6 @@ def readDataTxt(DataSet_path, mode):
     txt_path = os.path.join(DataSet_path, txt_name[mode])
     with open(txt_path, 'r', encoding="utf-8") as f:
         dataSet = []
-        if mode == "all":
-            f.readline()
         for data in f.readlines():
             data = data.strip().split('&')
             data_list = [data[1], category_id[data[0]], int(data[3]), int(data[4])]

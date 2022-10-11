@@ -9,16 +9,16 @@ def get_parser():
     # ------------------------------ubuntu------------------------------------------
     parser.add_argument("--Data_path", type=str, default=r"/home/ubuntu/AVE_Dataset")
     parser.add_argument("--Video_path", type=str, default=r"/home/ubuntu/AVE_Dataset/Video")
-    # parser.add_argument("--Pic_path", type=str, default=r"/home/ubuntu/AVE_Dataset/Picture")
-    parser.add_argument("--Pic_path", type=str, default=r"/home/ubuntu/AVE_Dataset/Crop_Picture_valbA2")  # after_crop
+    parser.add_argument("--Pic_path", type=str, default=r"/home/ubuntu/AVE_Dataset/Picture")
+    # parser.add_argument("--Pic_path", type=str, default=r"/home/ubuntu/AVE_Dataset/Crop_Picture_valbA2")  # after_crop
     parser.add_argument("--H5_path", type=str, default=r"/home/ubuntu/AVE_Dataset/H5")
     parser.add_argument("--Att_re_path", type=str, default=r"/media/ubuntu/Data/Result/Att")
-    parser.add_argument("--Att_inf_path", type=str, default=r"/media/ubuntu/Data/Result/Att_50")
+    # parser.add_argument("--Att_inf_path", type=str, default=r"/media/ubuntu/Data/Result/Att_50")
     parser.add_argument("--Crop_path", type=str, default=r"/home/ubuntu/AVE_Dataset/Crop_Picture_50")
     parser.add_argument("--GT_path", type=str, default=r"/home/ubuntu/AVE_Dataset/GT")
     # parser.add_argument("--save_dir", type=str, default=r'/media/ubuntu/Data/Result/')
-    parser.add_argument("--save_dir", type=str, default=r'/media/ubuntu/Data/Result_crop/')
-    parser.add_argument("--SCAM_path", type=str, default=r'/media/ubuntu/Data/Result/SCAM')
+    parser.add_argument("--save_dir", type=str, default=r'/media/ubuntu/Data/Result/')
+    parser.add_argument("--SCAM_path", type=str, default=r'/media/ubuntu/Data/Result_crop/SCAM')
     # ------------------------------ win --------------------------------------------
     # parser.add_argument("--Data_path", type=str, default=r"D:\WorkPlace\Python\my_STA\AVE_Dataset")
     # parser.add_argument("--Video_path", type=str, default=r"D:\WorkPlace\Python\my_STA\AVE_Dataset\Video")
@@ -29,18 +29,18 @@ def get_parser():
     # ---------------------------------------------------------------------------------
     parser.add_argument("--need_val_repic_save", type=bool, default=False, help="Do you want to save all result_pic when val ?")
     parser.add_argument("--train_mode", type=str, default=r"train", help="train/test/val")
-    parser.add_argument("--STA_mode", type=str, default=r"S", help="S/ST/SA/STA")
+    parser.add_argument("--STA_mode", type=str, default=r"ST", help="S/ST/SA/STA")
     parser.add_argument("--val_Pepoch", type=int, default=1)
     parser.add_argument("--weight_decay", type=float, default=0.0005)
-    # parser.add_argument("--input_size", type=int, default=300)
+    parser.add_argument("--input_size", type=int, default=256)
     # parser.add_argument("--crop_size", type=int, default=256)
-    parser.add_argument("--input_size", type=int, default=356)
-    parser.add_argument("--crop_size", type=int, default=356)
-    parser.add_argument("--batch_size", type=int, default=32) # train 3090:S-64 SA-40 ST-20 test:2060:S-128 SA:50 ST:64
-    parser.add_argument("--lr", type=float, default=0.00005)
+    # parser.add_argument("--input_size", type=int, default=356)
+    # parser.add_argument("--crop_size", type=int, default=356)
+    parser.add_argument("--batch_size", type=int, default=8) # train 3090:S-64 SA-40 ST-20 test:2060:S-128 SA:50 ST:64
+    parser.add_argument("--lr", type=float, default=0.0001)
     parser.add_argument("--decay_points", type=str, default='5,10')  # 衰变点
-    parser.add_argument("--epoch", type=int, default=60)
-    parser.add_argument("--global_counter", type=int, default=0)
+    parser.add_argument("--epoch", type=int, default=30)
+    # parser.add_argument("--global_counter", type=int, default=0)
     parser.add_argument("--disp_interval", type=int, default=10)
 
     print(parser.parse_args())

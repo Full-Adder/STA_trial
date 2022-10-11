@@ -8,11 +8,11 @@ import resampy
 import numpy as np
 from utils.DataFromtxt import readDataTxt
 
-Data_path = r"AVE_Dataset"
-Video_path = r"AVE_Dataset/Video"
-Pic_path = r"AVE_Dataset/Picture"
-Audio_path = r"AVE_Dataset/Audio"
-H5_path = r"AVE_Dataset/H5"
+Data_path = r"/home/ubuntu/AVE_Dataset"
+Video_path = r"/home/ubuntu/AVE_Dataset/Video"
+Pic_path = r"/media/ubuntu/Data/Picture"
+Audio_path = r"/media/ubuntu/Data/Audio"
+H5_path = r"/media/ubuntu/Data/H5"
 
 
 def save_image(image, addr, num):
@@ -20,7 +20,7 @@ def save_image(image, addr, num):
     cv2.imwrite(address, image)
 
 
-def mp4_to_jpg(video_path, pic_save_path, start_time, end_time):
+def mp4_to_jpg(video_path, pic_save_path, start_time=0, end_time=10):
     _, video_name = os.path.split(video_path)
     folder_name = video_name.split('.')[0]  # mp4文件名，无后缀,也是目标地址的文件夹名
     folder_path = os.path.join(pic_save_path, folder_name)  # 新的目录存放每个视频的图片
@@ -45,13 +45,13 @@ def mp4_to_jpg(video_path, pic_save_path, start_time, end_time):
     print('save_success ' + folder_path)
 
 
-def generate_jpg():
-    data_list = readDataTxt(Data_path, "all")
+def generate_jpg(mode):
+    data_list = readDataTxt(Data_path, mode)
     for data in data_list:
-        mp4_to_jpg(os.path.join(Video_path, data[0] + ".mp4"), Pic_path, data[-2], data[-1])
+        mp4_to_jpg(os.path.join(Video_path, data[0] + ".mp4"), Pic_path)  # , data[-2], data[-1])
 
 
-def mp4_to_wav(videos_path, to_path, start_time, end_time):
+def mp4_to_wav(videos_path, to_path, start_time=0, end_time=10):
     videos_file_path = videos_path + ".mp4"
     my_clip = mp.VideoFileClip(videos_file_path)
     if end_time - start_time != 10:
@@ -61,12 +61,12 @@ def mp4_to_wav(videos_path, to_path, start_time, end_time):
     my_clip.audio.write_audiofile(audio_path)
 
 
-def generate_wav():
+def generate_wav(mode):
     if not os.path.exists(Audio_path):
         os.makedirs(Audio_path)
-    data_list = readDataTxt(Data_path, "all")
+    data_list = readDataTxt(Data_path, mode)
     for data in data_list:
-        mp4_to_wav(os.path.join(Video_path, data[0]), Audio_path, data[-2], data[-1])
+        mp4_to_wav(os.path.join(Video_path, data[0]), Audio_path)  # data[-2], data[-1]
 
 
 def wav_to_h5(audio_path, to_path):
@@ -98,18 +98,21 @@ def wav_to_h5(audio_path, to_path):
     print(Audio_name, ".h5 is ok")
 
 
-def generate_h5():
+def generate_h5(mode='train'):
     if not os.path.exists(H5_path):
         os.makedirs(H5_path)
-    data_list = readDataTxt(Data_path, "all")
+    data_list = readDataTxt(Data_path, mode)
     for data in data_list:
         wav_to_h5(os.path.join(Audio_path, data[0]), H5_path)
 
 
 def modefy_data():
-    generate_jpg()
-    generate_wav()
-    generate_h5()
+    generate_jpg("train")
+    generate_jpg("test")
+    generate_wav("train")
+    generate_wav("test")
+    generate_h5("train")
+    generate_h5("test")
 
 
 if __name__ == "__main__":

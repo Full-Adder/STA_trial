@@ -12,7 +12,7 @@ args = get_parser()
 
 def generate_att(STA_mode=args.STA_mode, Pic_path=args.Pic_path, H5_path=args.H5_path,
                  batch_size=args.batch_size, input_size=args.input_size,
-                 att_dir=args.Att_re_path, model_train_epoch=12):
+                 att_dir=None, mode="train", model_train_epoch=12):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     save_weight_fold = os.path.join(args.save_dir, STA_mode, './model_weight/')
 
@@ -30,8 +30,8 @@ def generate_att(STA_mode=args.STA_mode, Pic_path=args.Pic_path, H5_path=args.H5
     model.eval()
 
     train_loader = get_dataLoader(Pic_path=Pic_path, H5_path=H5_path, GT_path=None,
-                                  train_mode="att", STA_mode=STA_mode,
-                                  batch_size=batch_size, input_size=input_size, crop_size=356, after_crop=True)
+                                  train_mode=mode, STA_mode=STA_mode,
+                                  batch_size=batch_size, input_size=input_size)
 
     for idx_test, dat_test in enumerate(train_loader):
         with torch.no_grad():
@@ -88,7 +88,7 @@ def generate_att(STA_mode=args.STA_mode, Pic_path=args.Pic_path, H5_path=args.H5
                                          str(class_id[i].numpy()), str(h_x[i][class_id[i]].cpu().numpy())])+'\n')
                 # STA_mode 图片名称 预测概率最高的标签 概率 真实标签 预测的真实标签概率
                 txt_file.close()
-                print(STA_mode, "has save", save_accu_map_path)
+                print(STA_mode, idx_test, "/", len(train_loader), "has save", save_accu_map_path)
 
 
 if __name__ == "__main__":
@@ -105,10 +105,10 @@ if __name__ == "__main__":
     # generate_att(STA_mode="SA", batch_size=500, model_train_epoch=13, att_dir=att)
     #
     # # ========================== maybe best (+2) ============================
-    att = r"/media/ubuntu/Data/Result/Att_valbA2"
-    generate_att(STA_mode="S", batch_size=550, model_train_epoch=13, att_dir=att)
-    generate_att(STA_mode="ST", batch_size=170, model_train_epoch=11, att_dir=att)
-    generate_att(STA_mode="SA", batch_size=500, model_train_epoch=14, att_dir=att)
+    # att = r"/media/ubuntu/Data/Result/Att_valbA2"
+    # generate_att(STA_mode="S", batch_size=550, model_train_epoch=13, att_dir=att)
+    # generate_att(STA_mode="ST", batch_size=170, model_train_epoch=11, att_dir=att)
+    # generate_att(STA_mode="SA", batch_size=500, model_train_epoch=14, att_dir=att)
     #
     # # ========================== propose best (30) ============================
     # att = r"/media/ubuntu/Data/Result/Att_30"
@@ -116,10 +116,14 @@ if __name__ == "__main__":
     # generate_att(STA_mode="ST", batch_size=170, model_train_epoch=30, att_dir=att)
     # generate_att(STA_mode="SA", batch_size=500, model_train_epoch=30, att_dir=att)
     #
-    # # ========================== true best (30) ============================
-    # att = r"/media/ubuntu/Data/Result/Att_50"
-    # generate_att(STA_mode="S", batch_size=550, model_train_epoch=50, att_dir=att)
-    # generate_att(STA_mode="ST", batch_size=170, model_train_epoch=50, att_dir=att)
-    # generate_att(STA_mode="SA", batch_size=500, model_train_epoch=50, att_dir=att)
+    # # ========================== true best (50) ============================
+    # att = r"/media/ubuntu/Data/Result_crop/Att_30"
+    # generate_att(STA_mode="S", batch_size=200, model_train_epoch=30, att_dir=att)
+    # generate_att(STA_mode="ST", batch_size=200, model_train_epoch=30, att_dir=att)
+    # generate_att(STA_mode="SA", batch_size=300, model_train_epoch=30, att_dir=att)
 
-    pass
+    generate_att(STA_mode=args.STA_mode, batch_size=args.batch_size, model_train_epoch=args.epoch,
+                 mode='train', att_dir=args.Att_re_path)
+    generate_att(STA_mode=args.STA_mode, batch_size=args.batch_size, model_train_epoch=args.epoch,
+                 mode='test', att_dir=args.Att_re_path)
+

@@ -15,7 +15,7 @@ def MatrixNormalization(M):
         return M
 
 
-def refuse(mode, att_dir=None):
+def refuse(mode, all_pic_path, crop_path, att_dir=None):
     args = get_parser()
     Data_p = args.Data_path
     if att_dir is None:
@@ -23,9 +23,10 @@ def refuse(mode, att_dir=None):
 
     data_list = readDataTxt(Data_p, mode)
     for num, data in enumerate(data_list):
-        for id in range(data[-2] + 1, data[-1] - 1):
+        for id in range(data[-2] + 2, data[-1] - 2):
             att_Pic_dir = os.path.join(att_dir, data[0], "%02d" % id)
             Att_pic_S = os.path.join(att_Pic_dir + '_S.png')
+            print(Att_pic_S)
             Att_pic_SA = os.path.join(att_Pic_dir + '_SA.png')
             Att_pic_ST = os.path.join(att_Pic_dir + '_ST.png')
             Att_pic_txt = os.path.join(att_Pic_dir + '.txt')
@@ -51,33 +52,39 @@ def refuse(mode, att_dir=None):
 
             probS, probA, probT = dataSet["S"], dataSet["SA"], dataSet["ST"]
 
-            Up = V * probS + A * probA + T * probT + 0.0001
-            Down = probS + probT + probA + 0.0001
+            Up = V * probS + A * probA + T * probT + 0.00001
+            Down = probS + probT + probA + 0.00001
             F = MatrixNormalization(Up / Down)
 
-            Pic_dir = os.path.join(args.Pic_path, data[0], "%02d" % id)
-            RGB = cv2.imread(Pic_dir + r'.jpg')
-            with open(Pic_dir + "_crop.txt", 'r', encoding='utf-8') as f:
-                data = f.readline().strip().split('&')
-                min_row, max_row, min_col, max_col = int(data[0]), int(data[1]), int(data[2]), int(data[3])
+            Pic_dir = os.path.join(all_pic_path, data[0], "%02d" % id)
+            crop_txt = os.path.join(crop_path, data[0], "%02d" % id)
+            RGB = cv2.resize(cv2.imread(Pic_dir + r'.jpg'), (356, 356))
+            with open(crop_txt + "_crop.txt", 'r', encoding='utf-8') as f:
+                d_txt = f.readline().strip().split('&')
+                min_row, max_row, min_col, max_col = int(d_txt[0]), int(d_txt[1]), int(d_txt[2]), int(d_txt[3])
 
-            heatmap = cv2.resize(F, (max_row - min_row + 1, max_col - min_col + 1))
+            heatmap = cv2.resize(F, (max_col - min_col + 1, max_row - min_row + 1))
             mask = np.zeros((356, 356))
             mask[min_row:max_row+1, min_col:max_col+1] = heatmap
-            heatmap = cv2.applyColorMap((mask * 255).astype(np.uint8), cv2.COLORMAP_JET)
-            SCAM_re = heatmap * 0.3 + RGB * 0.5
+            SCAM_path = os.path.join(args.SCAM_path, data[0])
+            if not os.path.exists(SCAM_path):
+                os.makedirs(SCAM_path)
+            gt_path = os.path.join(SCAM_path, "%02d" % id)
+            cv2.imwrite(gt_path + ".png", mask)
 
-            SCAM_path = os.path.join(args.SCAM_path, data[0], "%02d" % id)
-            cv2.imwrite(SCAM_path + "_re_SCAM.jpg", SCAM_re)
-            print("write SCAM pic to", SCAM_path + "_re_SCAM.jpg")
+            heat_mask = cv2.applyColorMap((mask * 255).astype(np.uint8), cv2.COLORMAP_JET)
+            SCAM_re = heat_mask * 0.3 + RGB * 0.5
+            cv2.imwrite(att_Pic_dir + "_re_SCAM.jpg", SCAM_re)
+            print("write SCAM pic to", att_Pic_dir + "_re_SCAM.jpg")
 
         print(num, "/", len(data_list), data[0], "is ok!")
 
 
 if __name__ == "__main__":
     mode = "all"
-    att = r"/media/ubuntu/Data/Result_crop/Att_valbA2"
-    refuse(mode, att_dir=att)
-
+    att = r"/media/ubuntu/Data/Result_crop/Att_60"
+    pic_path = r"/home/ubuntu/AVE_Dataset/Picture"
+    crop_txt = r"/home/ubuntu/AVE_Dataset/Crop_Picture_valbA2"
+    refuse(mode, att_dir=att, all_pic_path=pic_path, crop_path=crop_txt)
 
     pass
