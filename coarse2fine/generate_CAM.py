@@ -3,6 +3,9 @@ import numpy as np
 import torch.nn.functional as F
 import cv2
 import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.DataLoader import get_dataLoader
 from utils.model_tool import get_model
 from utils.args_config import get_parser

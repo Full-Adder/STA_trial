@@ -26,7 +26,6 @@ def test(model, STA_mode, Pic_path, H5_path, GT_path, is_val, save_index, batch_
     else:
         save_path_hh = test_re_dir
 
-    val_mode = "val" if is_val else "test"
     test_loader = get_dataLoader(Pic_path=Pic_path, H5_path=H5_path, GT_path=GT_path,
                                  train_mode="test", STA_mode=STA_mode,
                                  batch_size=batch_size, input_size=input_size)  # 获取测试集
@@ -208,7 +207,7 @@ def load_model_weight_bef_test(test_weight_id=-1, STA_mode="S", fname=r'test_res
     writer = SummaryWriter(os.path.join(args.save_dir, STA_mode, r'./test_log/',
                                         r'./%s_%s_%s/' % (STA_mode, fname, test_epoch)))
     test(model=net, STA_mode=STA_mode, Pic_path=args.Pic_path, H5_path=args.H5_path, GT_path=args.GT_path, is_val=False,
-         save_index=0, batch_size=args.batch_size, input_size=args.input_size, crop_size=args.crop_size,
+         save_index=0, batch_size=args.batch_size, input_size=args.input_size,
          dataset_name=args.dataset_name, Summary_Writer=writer, test_re_dir=test_result_dir)
     writer.close()
     # ========================================================================
@@ -216,7 +215,7 @@ def load_model_weight_bef_test(test_weight_id=-1, STA_mode="S", fname=r'test_res
 
 if __name__ == '__main__':
     # args = get_parser()
-    load_model_weight_bef_test(test_weight_id=50, STA_mode="S")
+    load_model_weight_bef_test(test_weight_id=7, STA_mode="ST")
 
     # for i in range(31, 32):
     #     print("now let's test weight", i)

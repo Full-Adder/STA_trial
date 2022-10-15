@@ -72,8 +72,10 @@ def refuse(mode, all_pic_path, crop_path, att_dir=None):
             gt_path = os.path.join(SCAM_path, "%02d" % id)
             cv2.imwrite(gt_path + ".png", mask)
 
-            heat_mask = cv2.applyColorMap((mask * 255).astype(np.uint8), cv2.COLORMAP_JET)
+            mask = (mask * 255).astype(np.uint8)
+            heat_mask = cv2.applyColorMap(mask, cv2.COLORMAP_JET)
             SCAM_re = heat_mask * 0.3 + RGB * 0.5
+            cv2.imwrite(crop_txt + "_gt,jpg", mask)
             cv2.imwrite(att_Pic_dir + "_re_SCAM.jpg", SCAM_re)
             print("write SCAM pic to", att_Pic_dir + "_re_SCAM.jpg")
 

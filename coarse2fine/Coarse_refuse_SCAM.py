@@ -1,6 +1,9 @@
 import os
+import sys
 import numpy as np
 import cv2
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.args_config import get_parser
 from utils.DataFromtxt import readDataTxt
 
@@ -15,17 +18,12 @@ def MatrixNormalization(M):
         return M
 
 
-def generate_crop(mode, att_dir=None, crop_path=None):
-    args = get_parser()
-    Data_p = args.Data_path
-    if att_dir is None:
-        att_dir = args.Att_inf_pat
-    if crop_path is None:
-        crop_path = args.Crop_path
-
+def generate_crop(mode, Data_p, att_dir):
     data_list = readDataTxt(Data_p, mode)
     for num, data in enumerate(data_list):
-        for id in range(data[-2] + 1, data[-1] - 1):
+        if data[-1] - data[-2] <= 3:
+            continue
+        for id in range(data[-2], data[-1]):
             att_Pic_dir = os.path.join(att_dir, data[0], "%02d" % id)
             Att_pic_S = os.path.join(att_Pic_dir + '_S.png')
             Att_pic_SA = os.path.join(att_Pic_dir + '_SA.png')
@@ -59,32 +57,30 @@ def generate_crop(mode, att_dir=None, crop_path=None):
 
             alpha = 2.0
             [row, col] = np.where(F > alpha * np.mean(F))
-            while row.size == 0 or col.size == 0 or np.max(col) - np.min(col) < 35 or np.max(row) - np.min(row) < 35:
+            while row.size == 0 or col.size == 0 or np.max(col) - np.min(col) < 100 or np.max(row) - np.min(row) < 100:
                 alpha = alpha - 0.05
                 [row, col] = np.where(F > alpha * np.mean(F))
 
             max_col, max_row, min_col, min_row = np.max(col), np.max(row), np.min(col), np.min(row)
+            with open(att_Pic_dir + "_crop.txt", 'w', encoding='utf-8') as f:
+                f.write('&'.join(str(i) for i in [min_row, max_row, min_col, max_col, alpha]))
 
             RGB_path = os.path.join(args.Pic_path, data[0], "%02d" % id + ".jpg")
             RGB = cv2.resize(cv2.imread(RGB_path), (356, 356))
-            cut_result = RGB[min_row: max_row + 1, min_col: max_col + 1, :]
-            heatmap = cv2.applyColorMap((F * 255).astype(np.uint8), cv2.COLORMAP_JET)
+            F = (F * 255).astype(np.uint8)
+            heatmap = cv2.applyColorMap(F, cv2.COLORMAP_JET)
             SCAM_re = heatmap * 0.3 + RGB * 0.5
 
-            if not os.path.exists(os.path.join(crop_path, data[0])):
-                os.makedirs(os.path.join(crop_path, data[0]))
-            Crop_path = os.path.join(crop_path, data[0], "%02d" % id)
-            cv2.imwrite(Crop_path + ".jpg", cut_result)
-            print("write crop pic to", Crop_path + ".jpg")
-            SCAM_path = os.path.join(args.SCAM_path, data[0], "%02d" % id)
-            cv2.imwrite(att_Pic_dir + "_crop.jpg", cut_result)
-            print("write crop pic to", att_Pic_dir + "_crop.jpg")
-            cv2.imwrite(att_Pic_dir + "_re_SCAM.jpg", SCAM_re)
-            print("write SCAM pic to", att_Pic_dir + "_re_SCAM.jpg")
+            # cut_result = RGB[min_row: max_row + 1, min_col: max_col + 1, :]
+            # cv2.imwrite(Crop_path + ".jpg", cut_result)
+            # print("write crop pic to", Crop_path + ".jpg")
+            # SCAM_path = os.path.join(args.SCAM_path, data[0], "%02d" % id)
+            # cv2.imwrite(att_Pic_dir + "_crop.jpg", cut_result)
+            # print("write crop pic to", att_Pic_dir + "_crop.jpg")
 
-            f = open(Crop_path + "_crop.txt", 'w', encoding='utf-8')
-            f.write('&'.join(str(i) for i in [min_row, max_row, min_col, max_col, alpha]))
-            f.close()
+            cv2.imwrite(att_Pic_dir + "_re_SCAM.jpg", SCAM_re)
+            cv2.imwrite(att_Pic_dir + "_re_SCAM.png", F)
+            print("write SCAM pic to", att_Pic_dir + "_re_SCAM.jpg")
 
         print(num, "/", len(data_list), data[0], "is ok!")
 
@@ -107,9 +103,12 @@ def test():
 
 if __name__ == "__main__":
     # test()
-    mode = "all"
-    att = r"/media/ubuntu/Data/Result/Att_valbA2"
-    crop = r"/media/ubuntu/Data/Result/Crop_Picture_valbA2"
-    generate_crop(mode, att_dir=att, crop_path=crop)
+
+    # att = r"/media/ubuntu/Data/Result/Att_valbA2"
+    # crop = r"/media/ubuntu/Data/Result/Crop_Picture_valbA2"
+
+    args = get_parser()
+    generate_crop(mode="train", Data_p=args.Data_path, att_dir=args.Att_re_path)
+    generate_crop(mode="test", Data_p=args.Data_path, att_dir=args.Att_re_path)
 
 # ls -l|grep "^d"| wc -l 查看当前目录下的文件夹目录个数（不包含子目录中的目录)

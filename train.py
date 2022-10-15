@@ -12,6 +12,10 @@ from test import test
 from torch.utils.tensorboard import SummaryWriter
 import utils.myoptim as my_optim
 
+m_seed = 57492
+torch.manual_seed(m_seed)
+torch.cuda.manual_seed_all(m_seed)
+
 
 def train(args):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
