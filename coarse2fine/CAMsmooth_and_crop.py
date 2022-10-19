@@ -33,16 +33,19 @@ def smooth_and_crop(mode, dataset_path, pic_path, att_path, crop_path):
                 f.write('&'.join(str(avg) for avg in avg3_smooth))
 
             min_row, max_row, min_col, max_col = avg3_smooth[0], avg3_smooth[1], avg3_smooth[2], avg3_smooth[3]
-            # print(min_row, max_row, min_col, max_col)
+            print(min_row, max_row, min_col, max_col)
             RGB_path = osp.join(pic_path, data_name[0], "%02d" % i + ".jpg")
             RGB = cv2.resize(cv2.imread(RGB_path), (356, 356))
             cut_result = RGB[min_row: max_row + 1, min_col: max_col + 1, :]
-            print(cut_result.shape)
+            # print(cut_result.shape)
             # print(min_row, max_row, min_col, max_col)
             crop_save_path = osp.join(crop_path, data_name[0], "%02d" % i + ".jpg")
             if not os.path.exists(osp.join(crop_path, data_name[0])):
                 os.makedirs(osp.join(crop_path, data_name[0]))
             cv2.imwrite(crop_save_path, cut_result)
+            crop_txt_path = osp.join(crop_path, data_name[0], "%02d_crop_smooth.txt" % i)
+            with open(crop_txt_path, 'w', encoding='utf-8') as f:
+                f.write('&'.join(str(avg) for avg in avg3_smooth))
             print("%4d/%4d  write crop pic to" % (num, len(data_name_list)), crop_save_path)
             RGB_ret = cv2.rectangle(RGB, (min_col, min_row), (max_col, max_row), (0, 0, 255), 8)
             RGB_ret_path = osp.join(att_path, data_name[0], "%02d_ret.jpg" % i)

@@ -77,24 +77,24 @@ class AVEDataset(Dataset):  # 数据集类
         gt_now_path = os.path.join(self.gt_dir, video_name, "%02d" % id + ".jpg")
         gt_now = self.transform_gt(Image.open(gt_now_path).convert('L'))
 
-        aud_bef_path = os.path.join(self.h5_dir, video_name, "%02d" % (id - 1) + ".h5")
-        aud_aft_path = os.path.join(self.h5_dir, video_name, "%02d" % (id + 1) + ".h5")
+        gt_bef_path = os.path.join(self.gt_dir, video_name, "%02d" % (id - 1) + ".jpg")
+        gt_aft_path = os.path.join(self.gt_dir, video_name, "%02d" % (id + 1) + ".jpg")
 
-        if os.path.exists(aud_bef_path):
+        if os.path.exists(gt_bef_path):
+            aud_bef_path = os.path.join(self.h5_dir, video_name, "%02d" % (id - 1) + ".h5")
             with h5py.File(aud_bef_path, 'r') as hf:
                 audio_features_bef = np.float32(hf['dataset'][:])  # 5,128
-                aud_bef = torch.from_numpy(audio_features_bef).float()
-            gt_bef_path = os.path.join(self.gt_dir, video_name, "%02d" % (id - 1) + ".jpg")
+            aud_bef = torch.from_numpy(audio_features_bef).float()
             gt_bef = self.transform_gt(Image.open(gt_bef_path).convert('L'))
         else:
             aud_bef = audio
             gt_bef = gt_now
 
-        if os.path.exists(aud_aft_path):
+        if os.path.exists(gt_aft_path):
+            aud_aft_path = os.path.join(self.h5_dir, video_name, "%02d" % (id + 1) + ".h5")
             with h5py.File(aud_aft_path, "r") as hf:
                 audio_features_aft = np.float32(hf['dataset'][:])
             aud_aft = torch.from_numpy(audio_features_aft).float()
-            gt_aft_path = os.path.join(self.gt_dir, video_name, "%02d" % (id + 1) + ".jpg")
             gt_aft = self.transform_gt(Image.open(gt_aft_path).convert('L'))
         else:
             aud_aft = audio

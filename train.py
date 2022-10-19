@@ -1,4 +1,5 @@
 import os
+import sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -15,6 +16,8 @@ import utils.myoptim as my_optim
 m_seed = 57492
 torch.manual_seed(m_seed)
 torch.cuda.manual_seed_all(m_seed)
+
+sys.path.append(r"./STA/")
 
 
 def train(args):
@@ -115,7 +118,7 @@ def train(args):
                 gt_bef = gt_bef.to(device)
                 gt_now = gt_now.to(device)
                 gt_aft = gt_aft.to(device)
-                audiocls = torch.load(r'STA/AudioSwitch.pt')
+                audiocls = torch.load('./STA/AudioSwitch.pt')
                 audiocls.cuda().eval()
                 with torch.no_grad():
                     switch_bef = audiocls(aud_bef, img_bef)

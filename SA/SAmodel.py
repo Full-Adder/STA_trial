@@ -16,9 +16,9 @@ class SANetModel(nn.Module):
         Amodel = list(Amodel.audnet.children())
         self.audio_model = nn.Sequential(*Amodel[:9])
         self.extra_audio_d = nn.Linear(8192, 2048)
-        self.Aup = nn.Sequential(nn.ConvTranspose2d(2048, 2048, kernel_size=3, stride=1, padding=0), nn.ReLU(True),
-                                 nn.ConvTranspose2d(2048, 2048, kernel_size=3, stride=1, padding=0), nn.ReLU(True),
-                                 nn.ConvTranspose2d(2048, 2048, kernel_size=4, stride=1, padding=0))
+        self.Aup = nn.Sequential(nn.ConvTranspose2d(2048, 2048, kernel_size=4, stride=2, padding=0), nn.ReLU(True),
+                                 nn.ConvTranspose2d(2048, 2048, kernel_size=4, stride=2, padding=0), nn.ReLU(True),
+                                 nn.ConvTranspose2d(2048, 2048, kernel_size=3, stride=1, padding=0))
         # if in course stage kernel_size = [3,3,4][1,1,1], while in fine stage k_size = [4,4,3][2,2,1]
 
 

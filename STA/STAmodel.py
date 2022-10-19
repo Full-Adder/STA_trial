@@ -25,7 +25,7 @@ class STANet(nn.Module):
                                  nn.ConvTranspose2d(2048, 2048, kernel_size=3, stride=1, padding=0))
 
         # net = torch.hub.load('facebookresearch/WSL-Images','resnext101_32x8d_wsl')
-        net = torch.hub.load('../tmp/facebookresearch_WSL-Images_main', 'resnext101_32x8d_wsl', source='local')
+        net = torch.hub.load('./tmp/facebookresearch_WSL-Images_main', 'resnext101_32x8d_wsl', source='local')
         net = list(net.children())
         self.features0 = nn.Sequential(*net[:6])
         self.features1 = nn.Sequential(*net[6])
