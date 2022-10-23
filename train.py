@@ -163,11 +163,11 @@ def train(args):
                       format(dt, epoch + 1, args.epoch, (idx + 1), len(train_loader),
                              optimizer.param_groups[0]['lr'], loss=losses))
 
-        if (epoch + 1) % args.val_Pepoch == 0:
-            print("------------------------------val:start-----------------------------")
-            test(model, args.STA_mode, args.Pic_path, args.H5_path, args.GT_path, True, epoch, args.batch_size,
-                 args.input_size, args.dataset_name, writer, val_re_save_path)
-            print("------------------------------ val:end -----------------------------")
+#       if (epoch + 1) % args.val_Pepoch == 0:
+#           print("------------------------------val:start-----------------------------")
+#            test(model, args.STA_mode, args.Pic_path, args.H5_path, args.GT_path, True, epoch, args.batch_size,
+#                 args.input_size, args.dataset_name, writer, val_re_save_path)
+#            print("------------------------------ val:end -----------------------------")
 
         if not os.path.exists(save_weight_fold):
             os.makedirs(save_weight_fold)
@@ -178,7 +178,7 @@ def train(args):
 
         model.train()
 
-        if (epoch + 1) % 10 == 0:
+        if (epoch + 1) % 5 == 0:
             save_checkpoint({
                 'epoch': epoch,  # 当前轮数
                 'state_dict': model.state_dict(),  # 模型参数

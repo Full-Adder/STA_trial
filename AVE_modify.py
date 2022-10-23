@@ -15,12 +15,15 @@ Audio_path = r"/media/ubuntu/Data/Audio"
 H5_path = r"/media/ubuntu/Data/H5"
 
 
-def save_image(image, addr, num):
-    address = os.path.join(addr, "{:0>2d}".format(num) + '.jpg')
+def save_image(image, addr, num, point):
+    if point == 2:
+        address = os.path.join(addr, "{:0>2d}".format(num) + '.jpg')
+    else:
+        address = os.path.join(addr, "{:0>4d}".format(num) + '.jpg')
     cv2.imwrite(address, image)
 
 
-def mp4_to_jpg(video_path, pic_save_path, start_time=0, end_time=10):
+def mp4_to_jpg(video_path, pic_save_path, start_time=0, end_time=10, point=2):
     _, video_name = os.path.split(video_path)
     folder_name = video_name.split('.')[0]  # mp4文件名，无后缀,也是目标地址的文件夹名
     folder_path = os.path.join(pic_save_path, folder_name)  # 新的目录存放每个视频的图片
@@ -36,8 +39,8 @@ def mp4_to_jpg(video_path, pic_save_path, start_time=0, end_time=10):
     rval, frame = video.read()  # videoCapture.read() 函数，第一个返回值为是否成功获取视频帧，第二个返回值为返回的视频帧
     fps_id = 1
     while rval:  # 循环读取视频帧
-        if fps_id % round(fps) == fps // 2 and start_time <= fps_id // round(fps) <= end_time:  # 每隔fps帧进行存储操作 ,可自行指定间隔
-            save_image(frame, folder_path, fps_id // round(fps))
+        if fps_id % round(fps) == round(fps) // 2 and start_time <= fps_id // round(fps) <= end_time:  # 每隔fps帧进行存储操作 ,可自行指定间隔
+            save_image(frame, folder_path, fps_id // round(fps), point)
         # cv2.cvWaitKey(1)  # waitKey()--这个函数是在一个给定的时间内(单位ms)等待用户按键触发;如果用户没有按下 键,则接续等待(循环)
         rval, frame = video.read()
         fps_id = fps_id + 1
@@ -52,12 +55,13 @@ def generate_jpg(mode):
 
 
 def mp4_to_wav(videos_path, to_path, start_time=0, end_time=10):
-    videos_file_path = videos_path + ".mp4"
-    my_clip = mp.VideoFileClip(videos_file_path)
+    if not os.path.exists(to_path):
+        os.makedirs(to_path)
+    my_clip = mp.VideoFileClip(videos_path)
     if end_time - start_time != 10:
         my_clip.subclip(start_time, end_time)
     _, videos_name = os.path.split(videos_path)
-    audio_path = os.path.join(to_path, videos_name + ".wav")
+    audio_path = os.path.join(to_path, videos_name[:-4]+".wav")
     my_clip.audio.write_audiofile(audio_path)
 
 
@@ -66,10 +70,10 @@ def generate_wav(mode):
         os.makedirs(Audio_path)
     data_list = readDataTxt(Data_path, mode)
     for data in data_list:
-        mp4_to_wav(os.path.join(Video_path, data[0]), Audio_path)  # data[-2], data[-1]
+        mp4_to_wav(os.path.join(Video_path, data[0]+ ".mp4"), Audio_path)  # data[-2], data[-1]
 
 
-def wav_to_h5(audio_path, to_path):
+def wav_to_h5(audio_path, to_path, point=2):
     Audio_file_path = audio_path + ".wav"
     _, Audio_name = os.path.split(audio_path)
     os.makedirs(os.path.join(to_path, Audio_name), exist_ok=True)
@@ -92,7 +96,10 @@ def wav_to_h5(audio_path, to_path):
         mean = np.mean(spectrogram)
         std = np.std(spectrogram)
         audio_output = np.divide(spectrogram - mean, std + 1e-9)  # 257，61
-        h5_path = os.path.join(to_path, Audio_name, "{:0>2d}".format(picp) + ".h5")
+        if point == 2:
+            h5_path = os.path.join(to_path, Audio_name, "{:0>2d}".format(picp) + ".h5")
+        else:
+            h5_path = os.path.join(to_path, Audio_name, "{:0>4d}".format(picp) + ".h5")
         with h5py.File(h5_path, 'w') as hf:
             hf.create_dataset("dataset", data=audio_output)
     print(Audio_name, ".h5 is ok")

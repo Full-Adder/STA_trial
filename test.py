@@ -134,7 +134,7 @@ def test(model, STA_mode, Pic_path, H5_path, GT_path, is_val, save_index, batch_
                 atts[atts < 0] = 0
 
                 att = atts[la].cpu().data.numpy()  # 转为numpy数组
-                att = np.rint(att / (att.max() + 1e-8) * 255)  # 归一化到0-255
+                att = np.clip(att, 0, 255)
                 att = np.array(att, np.uint8)
                 att = cv2.resize(att, (356, 356))  # 修改分辨率
 
@@ -194,12 +194,6 @@ def load_model_weight_bef_test(test_weight_id=-1, STA_mode="S", fname=r'test_res
     print("-----> let's test! -------------->")
     net.to(device)
 
-    # ============================val()======================================
-    # writer = SummaryWriter(r'./test_result/log')
-    # test(model=net, Pic_path=args.Pic_path, is_val=False, save_index=0, batch_size=args.batch_size,
-    #      input_size=args.input_size, dataset_name=args.dataset_name, Summary_Writer=writer,
-    #      test_re_dir=r'./test_result')
-    # =============================test()====================================
     test_result_dir = os.path.join(args.save_dir, STA_mode, r"pic_result",
                                    r'./%s_%s_%s/' % (STA_mode, fname, test_epoch))  # 结果保存文件夹
     if not os.path.exists(test_result_dir):
@@ -214,8 +208,8 @@ def load_model_weight_bef_test(test_weight_id=-1, STA_mode="S", fname=r'test_res
 
 
 if __name__ == '__main__':
-    # args = get_parser()
-    load_model_weight_bef_test(test_weight_id=7, STA_mode="ST")
+    args = get_parser()
+    load_model_weight_bef_test(test_weight_id=-1, STA_mode="ST")
 
     # for i in range(31, 32):
     #     print("now let's test weight", i)
