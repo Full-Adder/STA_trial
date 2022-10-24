@@ -15,9 +15,17 @@
 #                                    --epoch 15 \
 #                                    --save_dir "/media/ubuntu/Data/Result_STA/"
 
-python ./for_other_dataSet/run.py   --Pic_path "/media/ubuntu/Data/DataSet/AVAD/picture/" \
-                                    --H5_path "/media/ubuntu/Data/DataSet/AVAD/h5" \
-                                    --Att_re_path "/media/ubuntu/Data/Result_AVAD/" \
+#python ./for_other_dataSet/run.py   --Pic_path "/media/ubuntu/Data/DataSet/AVAD/picture/" \
+#                                    --H5_path "/media/ubuntu/Data/DataSet/AVAD/h5" \
+#                                    --Att_re_path "/media/ubuntu/Data/Result_AVAD/" \
+#                                    --input_size 356 \
+#                                    --batch_size 200 \
+#                                    --epoch 15 \
+#                                    --save_dir "/media/ubuntu/Data/Result_STA/"
+
+python ./for_other_dataSet/run.py   --Pic_path "/media/ubuntu/Data/DataSet/coutrot/picture/" \
+                                    --H5_path "/media/ubuntu/Data/DataSet/coutrot/h5" \
+                                    --Att_re_path "/media/ubuntu/Data/Result_coutrot/" \
                                     --input_size 356 \
                                     --batch_size 200 \
                                     --epoch 15 \
