@@ -16,5 +16,5 @@
 # python ./coarse2fine/generate_CAM.py --STA_mode "ST" --input_size 356 --batch_size 128 --epoch 30 --Pic_path "/home/ubuntu/AVE_Dataset/Crop_Att_30/" --save_dir "/media/ubuntu/Data/Result_crop/" --Att_re_path "/media/ubuntu/Data/fine_Att"
 # python ./coarse2fine/Fine_refuse_GT.py --Att_re_path "/media/ubuntu/Data/fine_Att" --Pic_path "/home/ubuntu/AVE_Dataset/Picture" --Crop_path "/home/ubuntu/AVE_Dataset/Crop_Att_30/" --GT_path "/home/ubuntu/AVE_Dataset/GT"
 # python train.py --STA_mode "STA" --input_size 356 --batch_size 3 --epoch 15 --save_dir "/media/ubuntu/Data/Result_STA/"
-python ./coarse2fine/see_mode_in_train.py --STA_mode "STA" --input_size 356 --batch_size 200 --epoch 15 --save_dir "/media/ubuntu/Data/Result_STA/"
+# python ./coarse2fine/see_mode_in_train.py --STA_mode "STA" --input_size 356 --batch_size 200 --epoch 15 --save_dir "/media/ubuntu/Data/Result_STA/"
 

@@ -5,7 +5,7 @@ import torch.optim as optim
 from S.Smodel import SNetModel
 from SA.SAmodel import SANetModel
 from ST.STModel import STNetModel
-from STA.STAmodel import STANet
+from STA.STAModel import STANetModel
 from utils.DataLoader import get_dataLoader
 from torch.utils.tensorboard import SummaryWriter
 
@@ -19,7 +19,7 @@ def get_model(STA_mode, lr=0.00005, weight_decay=0.0005):  # 获取 model
     elif STA_mode == "ST":
         model = STNetModel()
     else:   # STA
-        model = STANet()
+        model = STANetModel()
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)  # 加载到GPU:0

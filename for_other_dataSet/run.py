@@ -30,22 +30,27 @@ def test(model, dat_loader, Pic_path, save_path_hh):
             aud_bef = aud_aft.to(device)
             aud_now = aud_now.to(device)
             aud_aft = aud_aft.to(device)
-            audiocls = torch.load(r'STA/AudioSwitch.pt')
-            audiocls.cuda().eval()
-            with torch.no_grad():
-                switch_bef = audiocls(aud_bef, img_bef)
-                switch_now = audiocls(aud_now, img_now)
-                switch_aft = audiocls(aud_aft, img_aft)
 
-            p04, p03, p02, p14, p13, p12, p24, p23, p22 = model(img_bef, img_now, img_aft, aud_bef, aud_now, aud_aft,
-                                                                switch_bef, switch_now, switch_aft)
+            # audiocls = torch.load(r'STA/AudioSwitch.pt')
+            # audiocls.cuda().eval()
+            # with torch.no_grad():
+            #     switch_bef = audiocls(aud_bef, img_bef)
+            #     switch_now = audiocls(aud_now, img_now)
+            #     switch_aft = audiocls(aud_aft, img_aft)
+            #
+            # p04, p03, p02, p14, p13, p12, p24, p23, p22 = model(img_bef, img_now, img_aft, aud_bef, aud_now, aud_aft,
+            #                                                     switch_bef, switch_now, switch_aft)
+
+            map0, map0_1, map1, map1_1, map2, map2_1 = model(img_bef, img_now, img_aft, aud_bef, aud_now, aud_aft)
+
+
 
             for i in range(len(img_name)):  # 非0元素的个数
                 save_accu_map_folder = os.path.join(save_path_hh, img_name[i][:-5])
                 if not os.path.exists(save_accu_map_folder):
                     os.makedirs(save_accu_map_folder)
                 save_accu_map_path = os.path.join(save_accu_map_folder, img_name[i][-4:])
-                atts = F.sigmoid(p12[i, 0])
+                atts = F.sigmoid(map1[i, 0])
                 # print(atts)
                 att = atts.cpu().data.numpy()
 
@@ -73,6 +78,7 @@ def load_model_weight_bef_test(test_weight_id=15):
     if os.path.exists(best_pth):
         print("-----> find pretrained model weight in", best_pth)
         state = torch.load(best_pth)
+        net = torch.nn.DataParallel(net).cuda()
         net.load_state_dict(state)
     else:
         print("Error! There is not pretrained weight --", test_weight_id, " in", best_pth)

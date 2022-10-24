@@ -27,7 +27,7 @@ class OtherDataset(Dataset):  # 数据集类
             if idata[-1] - idata[-2] <= 3:
                 continue
             else:
-                for idx in range(idata[-2]+2, idata[-1]-2):
+                for idx in range(idata[-2]+1, idata[-1]-1):
                     self.data_list.append([os.path.join(idata[0], "{:0>4d}".format(idx))])
 
     def __len__(self):

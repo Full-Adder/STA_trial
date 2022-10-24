@@ -5,11 +5,11 @@ from moviepy.editor import VideoFileClip
 from AVE_modify import mp4_to_jpg, mp4_to_wav, wav_to_h5
 from OtherDataSet import get_filename_list_form_txt
 
-data_dir = r"/media/ubuntu/Data/DataSet/AVAD"
-mp4_dir = r"/media/ubuntu/Data/DataSet/AVAD/video"
-pic_dir = r"/media/ubuntu/Data/DataSet/AVAD/picture"
-wav_dir = r"/media/ubuntu/Data/DataSet/AVAD/audio"
-h5_dir = r"/media/ubuntu/Data/DataSet/AVAD/h5"
+data_dir = r"D:\WorkPlace\DataSet\AVAD"
+mp4_dir = r"D:\WorkPlace\DataSet\AVAD\Video"
+pic_dir = r"D:\WorkPlace\DataSet\AVAD\picture"
+wav_dir = r"D:\WorkPlace\DataSet\AVAD\audio"
+h5_dir = r"D:\WorkPlace\DataSet\AVAD\h5"
 txt_path = os.path.join(data_dir, 'filename.txt')
 
 
@@ -69,8 +69,8 @@ def get_from_dir():
 
 
 if __name__ == "__main__":
-    # gen_txt()
-    # a = get_filename_list_form_txt(txt_path)
-    # print(a)
-    # modify_AVAD()
+    gen_txt()
+    a = get_filename_list_form_txt(txt_path)
+    print(a)
+    modify_AVAD()
     get_from_dir()

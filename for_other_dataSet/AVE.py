@@ -1,13 +1,13 @@
 import os
 from moviepy.editor import VideoFileClip
-from AVE_modify import mp4_to_jpg, wav_to_h5
+from AVE_modify import mp4_to_jpg, wav_to_h5, mp4_to_wav
 from OtherDataSet import get_filename_list_form_txt
 
-data_dir = r"/media/ubuntu/Data/DataSet/DIEM"
-mp4_dir = r"/media/ubuntu/Data/DataSet/DIEM/video"
-pic_dir = r"/media/ubuntu/Data/DataSet/DIEM/picture"
-wav_dir = r"/media/ubuntu/Data/DataSet/DIEM/audio"
-h5_dir = r"/media/ubuntu/Data/DataSet/DIEM/h5"
+data_dir = r"D:\WorkPlace\DataSet\AVE"
+mp4_dir = r"D:\WorkPlace\DataSet\AVE\Video"
+pic_dir = r"D:\WorkPlace\DataSet\AVE\Picture"
+wav_dir = r"D:\WorkPlace\DataSet\AVE\Audio"
+h5_dir = r"D:\WorkPlace\DataSet\AVE\H5"
 txt_path = os.path.join(data_dir, 'filename.txt')
 
 
@@ -22,13 +22,14 @@ def gen_txt():
         f.writelines(mp4_list)
 
 
-def modify_DIEM():
+def modify_Coutrot():
     name_list = get_filename_list_form_txt(txt_path)
     for i, data in enumerate(name_list):
         name, st, en = data
         print(i, "now process", name)
         mp4_path = os.path.join(mp4_dir, name + ".mp4")
         mp4_to_jpg(mp4_path, pic_dir, st, en, 4)
+        mp4_to_wav(mp4_path, wav_dir, st, en)
         wav_path = os.path.join(wav_dir, name)
         wav_to_h5(wav_path, h5_dir, 4)
 
@@ -37,4 +38,4 @@ if __name__ == "__main__":
     gen_txt()
     a = get_filename_list_form_txt(txt_path)
     print(a)
-    # modify_DIEM()
+    modify_Coutrot()
